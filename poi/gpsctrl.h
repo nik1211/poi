@@ -1,0 +1,56 @@
+
+#ifndef __GPSCTRL_H__
+#define __GPSCTRL_H__
+
+#include "comdat.h"
+
+//--------------------------------------------------------------------------
+//  型定義																	
+//--------------------------------------------------------------------------
+// GPS情報型
+typedef struct{
+	U1 	b_sokui  :1; // 測位
+    U1 	b_spdAcc :1; // 速度確からしさ(TRUE/FALSE)
+    U1 	b_rx 	 :1; // 受信あり(motionでclear)
+    U1 	b_rsv 	 :5;
+	U2 	u2_spd; // 速度[単位:0.1km/h]
+	U2 	u2_deg; // 方位[単位:0.1deg]
+	S2 	s2_height; // 高度[単位:1m]
+	U4	lat; //緯度
+	U4	lon; // 経度
+	U1  u1_vetAccEst; // 高度確からしさ[0.1m] 仮
+}stGpsPos;
+
+typedef struct{
+	U1 	b_sokui       :1; // 測位
+	U1 	b_height_ok   :1; // 高度有効
+	U1 	b_spddeg_ok   :1; // 速度方位有効
+	U1	b_tim_ok 	  :1; // 時刻OK
+	U1 	b_mode		  :1; // GPS動作モード
+	U1 	b_rsv         :3;
+
+	stGpsPos st_pos; // uartからposデータを格納
+
+	U4	lat; // 緯度
+	U4	lon; // 経度
+	U2 	u2_spd; // 速度
+	U2	u2_deg; // 方位
+	U1	u1_usesatnum; // 測位使用衛星数
+	U1	u1_satnum; // 追尾衛星数
+	S2 	s2_height; // 高度
+
+	U1 	u1_latarea;	// 緯度エリア
+	U2 	u2_lonarea;	// 経度エリア
+
+	U1	u1_year; // 年
+	U1	u1_month; // 月
+	U1	u1_day;	// 日
+	U1	u1_hour; // 時
+	U1	u1_min; // 分
+	U1	u1_sec; // 秒
+}ST_GPSINF;
+
+#define	LATAREA_MAX			((U1)4)						// 緯度エリア最大値
+
+#endif
+
