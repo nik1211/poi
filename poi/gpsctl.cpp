@@ -10,10 +10,112 @@
 #include "stdafx.h"
 #include "gpsctrl.h"
 #include "gpsctrl.prm"
+#include "crypt.h"
 
 //--------------------------------------------------------------------------
 //  マクロ定義                                                              
 //--------------------------------------------------------------------------
+
+// オービス警報状態定義
+enum{
+	STS_ORBIS_NOALARM = 0,							// 非警報状態
+	STS_ORBIS_2100M,								// 2100m警報状態
+	STS_ORBIS_1100M,								// 1100m警報状態
+	STS_ORBIS_600M,									// 600m警報状態
+	STS_ORBIS_300M,									// 300m警報状態
+	STS_ORBIS_50M,									// 50m警報状態
+};
+
+// マイエリア
+enum{
+	STS_MYAREA_NOALARM = 0,							// 非警報状態
+	STS_MYAREA_1100M,								// 1100m警報状態
+	STS_MYAREA_600M,								// 600m警報状態
+	STS_MYAREA_50M,									// 50m警報状態
+};
+// マイキャンセル
+enum{
+	STS_MYCANCEL_RNGOUT = 0,						// 圏外状態
+	STS_MYCANCEL_200M,								// 200m圏内
+	STS_MYCANCEL_200M_RD,							// 200m圏内(RD受信あり)
+};
+// 自動キャンセル
+enum{
+	STS_ATCANCEL_RNGOUT = 0,						// 圏外状態
+	STS_ATCANCEL_REG1ST,							// 登録1回目通過
+	STS_ATCANCEL_200M_NORD,							// 200m圏内(RD受信なし)
+	STS_ATCANCEL_100M_NORD,							// 100m圏内(RD受信なし)
+	STS_ATCANCEL_RDRX,								// 圏内RD受信あり
+	STS_ATCANCEL_AACDIS,							// 圏内AAC禁止
+};
+// 自動キャンセル登録
+typedef enum{
+	REGSTS_IDLE = 0,								// 登録・削除待ち状態
+	REGSTS_SRCHPOS,									// 30～150m位置サーチ状態
+	REGSTS_CHK300M,									// 300m圏内チェック状態
+	REGSTS_CHK500M,									// 500m圏内チェック状態
+}EM_ATCANCEL_REGSTS;
+
+// SCPコンテンツ状態定義
+enum{
+	STS_SCP_RNGOUT = 0,								// 圏外
+	STS_SCP_100M,									// 100m圏内状態
+	STS_SCP_50M,									// 50m圏内状態
+};
+// ワンショットコンテンツ状態定義
+enum{
+	STS_ONESHOTCONT_NOALARM = 0,
+	STS_ONESHOTCONT_ALARM,
+};
+
+// 1kmコンテンツ状態定義
+enum{
+	STS_1KMCONT_NOALARM = 0,						// 非警報状態
+	STS_1KMCONT_1100M,								// 1100m警報状態
+	STS_1KMCONT_600M,								// 600m警報状態
+};
+// エリアタイプコンテンツ状態定義
+enum{
+	STS_AREACONT_OUTAREA = 0,						// エリア外状態
+	STS_AREACONT_INAREA,							// エリア内状態
+};
+
+// ETCゲート状態定義
+enum{
+	STS_ETC_NOPASS = 0,								// 未通過
+	STS_ETC_PASS,									// 通過
+};
+
+// 駐禁警報状態
+enum{
+	PCHK_WRN_OUT = 0,								// 圏外
+	PCHK_WRN_INSZ_NOSNDOUT,							// 最重点エリア音声未出力
+	PCHK_WRN_INSZ_SNDOUT,							// 最重点エリア音声出力済み
+	PCHK_WRN_INZ_NOSNDOUT,							// 重点エリア音声未出力
+	PCHK_WRN_INZ_SNDOUT,							// 重点エリア音声出力済み
+};
+
+// ゾーン30状態
+enum{
+	ZONE30_WRN_OUT = 0,								// 圏外
+	ZONE30_WRN_IN_NOSNDOUT,							// 圏内音声未出力
+	ZONE30_WRN_IN_SNDOUT,							// 圏内音声出力済み
+};
+
+// 車上狙い状態
+enum{
+	SHAJYO_WRN_OUT = 0,								// 圏外
+	SHAJYO_WRN_IN_NOSNDOUT,							// 圏内音声未出力
+	SHAJYO_WRN_IN_SNDOUT,							// 圏内音声出力済み
+};
+
+// トンネル内オービス警報状態定義
+enum{
+	STS_TUNNEL_ORBIS_NOALARM = 0,
+	STS_TUNNEL_ORBIS_2100M,
+	STS_TUNNEL_ORBIS_1100M,
+	STS_TUNNEL_ORBIS_600M,
+};
 
 // MAP生成フーズ中のサブフェーズ
 enum{
@@ -25,6 +127,34 @@ enum{
 #define	u4_LON_SPLIT_BASE		((U4)0x00740000)	// 分割基準経度
 #define	u4_LON_SPLIT_WIDTH		((U4)0x00000800)	// 経度分割幅
 #define	u2_DATA_SPLIT_NUM		((U2)576)			// データ分割数
+#define	u1_MAPDATA_SIZE			((U1)16)			// オービスROMデータサイズ
+
+enum{
+	TYPE_LAT = 0,
+	TYPE_LON,
+};
+
+// サーチ結果定義
+enum{
+	u1_SRCH_OK = 0,									// サーチ発見
+	u1_SRCH_NG_SMALL,								// サーチ発見できず上
+	u1_SRCH_NG_LARGE,								// サーチ発見できず下
+	u1_SRCH_NG_NONE,								// サーチ発見できずポイントなし
+	u1_SRCH_NG_DEV_BUSY,							// デバイスビジー
+	u1_SRCH_END,									// サーチ終了
+	u1_SRCH_MAX_ERR									// サーチ数最大エラー
+};
+
+// マップ登録結果定義
+enum{
+	REGOK = 0,
+	REGNG_LAT_SMALL,
+	REGNG_LAT_LARGE,
+	REGNG_LON_SMALL,
+	REGNG_LON_LARGE,
+	REGNG_MAP_MAX,
+	REGNG_EEP_BUSY
+};
 
 #define	VIRTUAL_INDEX_TYPES		7
 enum{
@@ -35,6 +165,14 @@ enum{
 	ETC_VIRTUAL_INDEX,
 	CURVE_VIRTUAL_INDEX,
 	ZN30_VIRTUAL_INDEX,
+};
+
+// エリア状態
+enum{
+	AREA_STATUS_OUT = 0,
+	AREA_STATUS_IN_NOFIRE,
+	AREA_STATUS_IN_FIRING,
+	AREA_STATUS_IN_FIRED,
 };
 
 typedef enum{
@@ -72,6 +210,11 @@ typedef struct{
 }ST_GPSROM;
 
 //--------------------------------------------------------------------------
+//  外部公開変数                                                            
+//--------------------------------------------------------------------------
+ST_GPS_STS	stg_gpsSts;
+
+//--------------------------------------------------------------------------
 //  変数定義
 //--------------------------------------------------------------------------
 static ST_GPSINF	sts_gpsinf;						// GPS入力情報
@@ -84,6 +227,7 @@ static U2			u2s_mkmap_loPri_num;			// 低優先マップ作成数
 static U2			u2s_mkmap_num;					// 作成マップ要素数
 static U2			u2s_chkmap_num;					// 判定マップ要素数
 static U2			u2s_oldmap_num;
+static U2			u2s_inisrch_pos;				// 初期サーチポイント
 static U2			u2s_lonarea_old;				// 経度エリア前回値
 static U2			u2s_srch_pos;					// サーチしているポイント
 static U2			u2s_high_pos;					// サーチ上端
@@ -96,9 +240,15 @@ static U4			u4s_latDiffPrmMinus;
 static U4			u4s_latDiffPrmPlus;
 static U4			u4s_lonDiffPrmMinus;
 static U4			u4s_lonDiffPrmPlus;
+static ST_GPSROM	sts_gpsrom;						// GPS ROMデータワーク
 
 static ST_INDEX1	sts_index1[3];					// 周辺INDEX1情報
 static ST_INDEX1 	*psts_index1;					// INDEX1ポインタ
+
+static UN_REGDAY	uns_today;						// 日付比較用
+
+static FILE	*gpsDataFile;
+char	gpspoi_filename[13];
 
 //--------------------------------------------------------------------------
 //  内部関数プロトタイプ宣言												
@@ -115,6 +265,7 @@ static U1	u1_ReadGpsData(U4 u4h_dataAddr, EM_TGT_DATA_TYPE type);
 //--------------------------------------------------------------------------
 //  内部const data定義
 //--------------------------------------------------------------------------
+const U2	u2g_dataSpec = 6;		//1006xxxx.txt
 
 //--------------------------------------------------------------------------
 //  外部関数定義															
@@ -284,6 +435,7 @@ static void PhaseMakeMap(void){
 		}
 	}
 srch_end:
+	return;
 }
 
 //-----------------------------------------------------------------------------------------------------------------------
@@ -341,6 +493,7 @@ static void	UpdLatLonArea(void){
 static void UpdIndex1(void){
 
 	U4	u4t_adr;									// 読出しアドレス
+	U4	rwsize;
 
 	// エリア変更なら新しくINDEX1を構築する
 	if(u2s_lonarea_old != sts_gpsinf.u2_lonarea){	// 変化有り？
@@ -349,14 +502,15 @@ static void UpdIndex1(void){
 
 		// YPデータ INDEX1
 		u4t_adr = sizeof(ST_HEADER) + ((U4)(u2s_srch_center_grp-1) * (U4)sizeof(ST_INDEX1));
-		if((FWUtil_FileOpen(e_FWUtilClient_3, &gpsDataFile, gpspoi_filename, FA_OPEN_EXISTING | FA_READ) == FR_OK)
-		&& (FWUtil_FileSeek(e_FWUtilClient_3, &gpsDataFile, u4t_adr) == FR_OK)
-		&& (FWUtil_FileRead(e_FWUtilClient_3, &gpsDataFile, &sts_index1[0], sizeof(ST_INDEX1)*3, &rwsize) == FR_OK)
-		&& (rwsize == sizeof(ST_INDEX1)*3)){
+		if((fopen_s(&gpsDataFile, gpspoi_filename, "rb") == 0)
+			&& (fseek(gpsDataFile, u4t_adr, SEEK_CUR) == 0)
+			&& ((rwsize = fread(&sts_index1[0], sizeof(unsigned char), sizeof(ST_INDEX1) * 3, gpsDataFile)) > 0)
+			&& (rwsize == sizeof(ST_INDEX1)*3))
+		{
 			// 暗号解除
-			DataCrypt(sizeof(ST_INDEX1)*3, u4t_adr, (U1 *)&sts_index1[0]);
+			DataCryptPoi(sizeof(ST_INDEX1)*3, u4t_adr, (U1 *)&sts_index1[0], u2g_dataSpec);
 		}
-		FWUtil_FileClose(e_FWUtilClient_3, &gpsDataFile);
+		fclose(gpsDataFile);
 
 		u2s_lonarea_old = sts_gpsinf.u2_lonarea;	// 前回経度エリアを保存
 	}
@@ -578,7 +732,6 @@ static U1	u1_RegMap(void){
 		pstt_mkmap->u2_dst_old = U2_MAX;
 		pstt_mkmap->u1_areaStsRd = AREA_STATUS_OUT;
 		pstt_mkmap->u1_areaStsSc = AREA_STATUS_OUT;
-		pstt_mkmap->u1_areaScSnd = SCSND_OFF;
 
 		if(sts_gpsrom.u1_type == TGT_ICANCEL){		// Iキャンセルのとき
 			if(sts_gpsrom.un_extra.dynamic.un_regday.hword == uns_today.hword){
@@ -624,56 +777,7 @@ static U4	u4_RomDeScrmble(ST_GPSROM *p_rom, U1 u1h_type){
 }
 
 static Bool	Can_data_pre_expire(ST_GPSROM *psth_gpsrom){
-
-	Bool	ret = FALSE;
-	// 密集度が高いものはマップに載せる時点で設定で捨てる
-	// 踏切、一時停止、公衆トイレ、交番
-	
-	// 旧誘導は捨てる
-	
-	switch(psth_gpsrom->u1_type){
-	case TGT_RAILROAD_CROSSING:
-		if(!stg_setGps[u1g_setAcsSel].b_fumikiri){
-			ret = TRUE;
-		}
-		break;
-	case TGT_TMPSTOP:
-		if(!stg_setGps[u1g_setAcsSel].b_tmpstop){
-			ret = TRUE;
-		}
-		break;
-
-	case TGT_NOFIX_YUDO:
-		if(psth_gpsrom->un_extra.yudo.u1_yudo_type != YUDO_TYPE_COMMON){
-			ret = TRUE;
-		}
-		break;
-
-	case TGT_TOILET:
-		if(!stg_setGps[u1g_setAcsSel].b_toilet){
-			ret = TRUE;
-		}
-		break;
-	case TGT_KOBAN:
-		if(!stg_setGps[u1g_setAcsSel].b_koban){
-			ret = TRUE;
-		}
-		break;
-
-	case TGT_FIRE:
-		if(!stg_setGps[u1g_setAcsSel].b_fire){
-			ret = TRUE;
-		}
-		break;
-
-	case TGT_HOIKU:
-		if(!stg_setGps[u1g_setAcsSel].b_hoiku){
-			ret = TRUE;
-		}
-		break;
-	}
-	
-	return ret;
+	return FALSE;
 }
 
 //--------------------------------------------------------------------------//
@@ -690,18 +794,16 @@ enum{
 };
 static U1	u1_ReadGpsData(U4 u4h_dataAddr, EM_TGT_DATA_TYPE type){
 
-	if((FWUtil_FileOpen(e_FWUtilClient_3, f, gpspoi_filename, FA_OPEN_EXISTING | FA_READ) != FR_OK)
-	|| (FWUtil_FileSeek(e_FWUtilClient_3, f, u4h_dataAddr) != FR_OK)
-	|| (FWUtil_FileRead(e_FWUtilClient_3, f, &sts_gpsrom, u1_MAPDATA_SIZE, &rwsize) != FR_OK)
-	|| (rwsize != u1_MAPDATA_SIZE)){
-		FWUtil_FileClose(e_FWUtilClient_3, f);
+	if((fopen_s(&gpsDataFile, gpspoi_filename, "rb") != 0)
+	|| (fseek(gpsDataFile, u4h_dataAddr, SEEK_CUR) != 0)
+	|| (fread(&sts_gpsrom, sizeof(unsigned char), u1_MAPDATA_SIZE, gpsDataFile) != u1_MAPDATA_SIZE)){
+		fclose(gpsDataFile);
 		return NG;
 	}
-	FWUtil_FileClose(e_FWUtilClient_3, f);
-	DataCrypt(u1_MAPDATA_SIZE, u4h_dataAddr, (U1 *)&sts_gpsrom);
+	fclose(gpsDataFile);
+	DataCryptPoi(u1_MAPDATA_SIZE, u4h_dataAddr, (U1 *)&sts_gpsrom, u2g_dataSpec);
 
 	sts_gpsrom.u4_addr = u4h_dataAddr;	// データの物理アドレスを保存
 
 	return	OK;
 }
-

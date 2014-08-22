@@ -1,3 +1,83 @@
+
+//--------------------------------------------------------------------------
+// マクロ定義																
+//--------------------------------------------------------------------------
+
+//#define	__HIGHWAY_ZONE_2KM__					// 高速道 ゾーン2km警報
+
+#define	GPSCTL_LSB			4
+#define	GPSCTL_LSB2			100
+
+#define	u4_LAT_BASE_MIN		((U4)0x00160106)			// 緯度ベース値
+#define	u4_LON_BASE_MIN		((U4)0x00710701)			// 経度ベース値
+#define	u4_LATLON_MSKPTN	((U4)0x001FFFFF)			// 緯度経度データビットマスク
+
+#define	u2_DIST_2500M		((U2)2500)					// 2500m判定距離
+#define	u2_DIST_2200M		((U2)2200)					// 2200m判定距離
+#define	u2_DIST_2100M		((U2)2100)					// 2100m判定距離
+#define	u2_DIST_2000M		((U2)2000)					// 2000m判定距離
+#define	u2_DIST_1900M		((U2)1900)					// 1900m判定距離
+#define	u2_DIST_1600M		((U2)1600)					// 1600m判定距離
+#define	u2_DIST_1500M		((U2)1500)					// 1500m判定距離
+#define	u2_DIST_1200M		((U2)1200)					// 1200m判定距離
+#define	u2_DIST_1100M		((U2)1100)					// 1100m判定距離
+#define	u2_DIST_1000M		((U2)1000)					// 1000m判定距離
+#define	u2_DIST_900M		((U2)900)					// 900m判定距離
+#define	u2_DIST_800M		((U2)800)					// 800m判定距離
+#define	u2_DIST_700M		((U2)700)					// 700m判定距離
+#define	u2_DIST_600M		((U2)600)					// 600m判定距離
+#define	u2_DIST_550M		((U2)550)					// 500m判定距離
+#define	u2_DIST_500M		((U2)500)					// 500m判定距離
+#define	u2_DIST_400M		((U2)400)					// 400m判定距離
+#define	u2_DIST_330M		((U2)330)					// 350m判定距離
+#define	u2_DIST_300M		((U2)300)					// 300m判定距離
+#define	u2_DIST_250M		((U2)250)					// 250m判定距離
+#define	u2_DIST_200M		((U2)200)					// 200m判定距離
+#define	u2_DIST_150M		((U2)150)					// 150m判定距離
+#define	u2_DIST_100M		((U2)100)					// 100m判定距離
+#define	u2_DIST_60M			((U2)60)					// 60m判定距離
+#define	u2_DIST_50M			((U2)50)					// 50m判定距離
+#define	u2_DIST_30M			((U2)30)					// 30m判定距離
+#define	u2_DIST_20M			((U2)20)					// 20m判定距離
+
+#define	DEGDAT_LSB			2							// オービスデータの角度LSB
+#define	s2_DEG_TGTRNG_MIN	((S2)(-40*DEG_LSB))			// ターゲット角の有効範囲最小(degA)
+#define	s2_DEG_TGTRNG_MAX	((S2)(40*DEG_LSB))			// ターゲット角の有効範囲最大(degA)
+#define	s2_DEG_TGTRNG_WIDE_MIN	((S2)(-80*DEG_LSB))		// ターゲット角の有効範囲最小(degA広範囲)
+#define	s2_DEG_TGTRNG_WIDE_MAX	((S2)(80*DEG_LSB))		// ターゲット角の有効範囲最大(degA広範囲)
+
+#define	s2_DEG_TGTFWD_MIN	((S2)(-80*DEG_LSB))			// ターゲット対向角の有効範囲最小(degB標準)
+#define	s2_DEG_TGTFWD_MAX	((S2)(80*DEG_LSB))			// ターゲット対向角の有効範囲最大(degB標準)
+
+#define	s2_DEG_TGTFWD_MIN_FAR	((S2)(-50*DEG_LSB))		// ターゲット対向角の有効範囲最小(degB遠方)
+#define	s2_DEG_TGTFWD_MAX_FAR	((S2)(50*DEG_LSB))		// ターゲット対向角の有効範囲最大(degB遠方)
+
+#define	s2_DEGRATE_FAR_AND_NORM		6					// 600m位置から100m遠方ほど左右方位を狭くする割合
+														// 600m位置80° 1100m位置50°
+														// 50-80=-30°/500m = -6°/100m
+
+#define	s2_DEG_TGTFWD_MIN_VERY_FAR	((S2)(-20*DEG_LSB))	// ターゲット対向角の有効範囲最小(degB超遠方)
+#define	s2_DEG_TGTFWD_MAX_VERY_FAR	((S2)(20*DEG_LSB))	// ターゲット対向角の有効範囲最大(degB超遠方)
+
+#define	s2_DEG_TGTFWD_MAX_HOKAN_NEAR	((S2)80 * DEG_LSB)	// ターゲット対向角の有効範囲(位置補完近接)
+#define	s2_DEGRATE_HOKAN_NEAR			27					//    0m:1100m = 80°:40°線形補完
+#define	s2_DEG_TGTFWD_MAX_HOKAN_FAR		((S2)40 * DEG_LSB)	// ターゲット対向角の有効範囲(位置補完遠方)
+#define	s2_DEGRATE_HOKAN_FAR			33					// 1100m:2100m = 40°:10°線形補完
+
+#define	s2_DEG_TGTLEFT_MIN	((S2)(-25*DEG_LSB))			// ターゲット左方向の最小値
+#define	s2_DEG_TGTRIGHT_MIN	((S2)(25*DEG_LSB))			// ターゲット右方向の最小値
+
+#define u1_NOAHEAD_HYS_COUNT	5						// 非前方判定回数
+#define s2_NOAHEAD_ABS_DEG_MIN	((S2)(-100*DEG_LSB))	// 非前方確定角最小
+#define s2_NOAHEAD_ABS_DEG_MAX	((S2)(100*DEG_LSB))		// 非前方確定角最大
+
+#define	VC_HIPRI_QUEUE_MAX	12							// 高優先音声キュー最大個数
+#define	VC_MIDPRI_QUEUE_MAX	6							// 中優先音声キュー最大個数
+#define	VC_LOPRI_QUEUE_MAX	3							// 低優先音声キュー最大個数
+
+#define	VC_MIDPRI_QUEUE_STA			VCGPS_ZONE_1KM
+#define	VC_LOPRI_QUEUE_STA			VCGPS_SCPCONT
+
 //--------------------------------------------------------------------------
 // const data定義															
 //--------------------------------------------------------------------------
@@ -193,3 +273,154 @@ static const U4	u4_TBL_LONDIST[][LATAREA_MAX+1] = {
 		1903,				// 42.5°～
 	},
 };
+
+// 距離レンジ変換テーブル
+static const U1	em_TBL_DISTRNG[TGT_GUARD_MAX][2] = {
+	//	一般				高速
+	{	DISTRNG_600M,		DISTRNG_600M		},		// dummy						0
+	{	DISTRNG_1600M,		DISTRNG_2500M		},		// RD ORBIS						1
+	{	DISTRNG_1600M,		DISTRNG_2500M		},		// HSYS ORBIS					2
+	{	DISTRNG_1600M,		DISTRNG_2500M		},		// LHSYS ORBIS					3
+	{	DISTRNG_1600M,		DISTRNG_2500M		},		// LOOP ORBIS					4
+	{	DISTRNG_1600M,		DISTRNG_2500M		},		// KODEN ORBIS					5
+
+	{	DISTRNG_1600M,		DISTRNG_2000M		},		// TRAP zone					6
+	{	DISTRNG_1600M,		DISTRNG_2000M		},		// CHKPNT zone					7
+	{	DISTRNG_900M,		DISTRNG_1100M		},		// N system						8
+	{	DISTRNG_900M,		DISTRNG_1100M		},		// traffic check system			9
+	{	DISTRNG_1600M,		DISTRNG_1600M		},		// My Area(無属性)				10
+	{	DISTRNG_600M,		DISTRNG_600M		},		// My Cancel(無属性)			11
+	{	DISTRNG_600M,		DISTRNG_600M		},		// I Cancel(無属性)				12
+
+	{	DISTRNG_1100M,		DISTRNG_1300M		},		// Police station				13
+	{	DISTRNG_600M,		DISTRNG_900M		},		// Cross check system			14
+	{	DISTRNG_600M,		DISTRNG_900M		},		// Often accident point			15
+	{	DISTRNG_600M,		DISTRNG_900M		},		// Check signal					16
+	{	DISTRNG_1600M,		DISTRNG_1600M		},		// Michinoeki					17
+	{	DISTRNG_1600M,		DISTRNG_1600M		},		// Highway oasys(高速)			18
+	{	DISTRNG_1600M,		DISTRNG_1600M		},		// Service Area(高速)			19
+	{	DISTRNG_1600M,		DISTRNG_1600M		},		// Pariking Area(高速)			20
+	{	DISTRNG_600M,		DISTRNG_600M		},		// Highway Radio(高速)			21
+	{	DISTRNG_400M,		DISTRNG_400M		},		// SCP_ICI(高速)				22
+	{	DISTRNG_400M,		DISTRNG_400M		},		// SCP_ICO(高速)				23
+	{	DISTRNG_400M,		DISTRNG_400M		},		// SCP_JCT(高速)				24
+	{	DISTRNG_400M,		DISTRNG_400M		},		// SCP_SPD(高速)				25
+	{	DISTRNG_400M,		DISTRNG_400M		},		// SCP_PO(高速)					26
+
+	{	DISTRNG_900M,		DISTRNG_900M		},		// 駐車禁止取締り最重点エリア	27
+	{	DISTRNG_2500M,		DISTRNG_2500M		},		// 駐車禁止取締り重点エリア		28
+	{	DISTRNG_600M,		DISTRNG_600M		},		// 駐車場						29
+	{	DISTRNG_600M,		DISTRNG_600M		},		// 固定キャンセルポイント		30
+	{	DISTRNG_1100M,		DISTRNG_1100M		},		// 急カーブ(高速)				31
+	{	DISTRNG_600M,		DISTRNG_600M		},		// 分岐合流ポイント(高速)		32
+	{	DISTRNG_400M,		DISTRNG_400M		},		// 県境							33
+	{	DISTRNG_1600M,		DISTRNG_1600M		},		// 長いトンネル(高速)			34
+	{	DISTRNG_600M,		DISTRNG_600M		},		// ETCレーン(高速)				35
+	{	DISTRNG_1100M,		DISTRNG_1600M		},		// 急勾配						36
+	{	DISTRNG_400M,		0					},		// 踏切							37
+	{	DISTRNG_2500M,		DISTRNG_2500M		},		// ユーザーピン					38
+	{	DISTRNG_2000M,		DISTRNG_2000M		},		// リンクユニット				39
+	{	DISTRNG_2500M,		DISTRNG_2500M		},		// リアルタイム取締エリア		40
+	{	DISTRNG_1600M,		DISTRNG_1600M		},		// とるぱ						41
+	{	DISTRNG_400M,		0					},		// 一時停止						42
+	{	DISTRNG_2500M,		DISTRNG_2500M		},		// 車上狙い多発エリア			43
+
+	{	DISTRNG_1300M,		DISTRNG_1300M		},		// 非測位誘導データ				44
+	{	DISTRNG_1600M,		DISTRNG_2500M		},		// 非測位RD式オービス			45
+	{	DISTRNG_1600M,		DISTRNG_2500M		},		// 非測位Hシステム式オービス	46
+	{	DISTRNG_1600M,		DISTRNG_2500M		},		// 非測位LHシステム式オービス	47
+	{	DISTRNG_1600M,		DISTRNG_2500M		},		// 非測位ループコイル式オービス	48
+	{	DISTRNG_1600M,		DISTRNG_2500M		},		// 非測位光電管式オービス		49
+
+	{	DISTRNG_1600M,		DISTRNG_2000M		},		// 非測位取締エリア				50
+	{	DISTRNG_1600M,		DISTRNG_2000M		},		// 非測位検問エリア				51
+	{	DISTRNG_400M,		DISTRNG_400M		},		// 公衆トイレ					52
+	{	DISTRNG_1300M,		DISTRNG_1300M		},		// 非測位センサ誘導データ		53
+	{	DISTRNG_1100M,		DISTRNG_1100M		},		// 交番							54
+
+	{	DISTRNG_400M,		DISTRNG_400M		},		// 消防署						55
+	{	DISTRNG_400M,		DISTRNG_400M		},		// 保育園・幼稚園				56
+
+	{	0,					0					},		// 高速バス停					57
+	{	DISTRNG_2500M,		DISTRNG_2500M		},		// ゾーン30						58
+};
+
+// 種番別データ優先度テーブル
+static const U1	u1_TBL_MAPPRI[TGT_GUARD_MAX] = 
+{
+	LO,								// dummy									0
+	HI,								// RD式オービス								1
+	HI,								// Hシステム式オービス						2
+	HI,								// LHシステム式オービス						3
+	HI,								// ループコイル式オービス					4
+	HI,								// 光電式オービス							5
+
+	HI,								// トラップゾーン							6
+	HI,								// チェックポイントゾーン					7
+
+	HI,								// Nシステム								8
+	HI,								// 交通監視システム							9
+
+	HI,								// マイエリア								10
+	HI,								// マイキャンセルエリア						11
+	HI,								// Iキャンセル(自動登録)					12
+
+	HI,								// 警察署									13
+	HI,								// 交差点監視システム						14
+	LO,								// 事故多発エリア							15
+	HI,								// 信号無視抑止システム						16
+	HI,								// 道の駅									17
+	HI,								// ハイウェイオアシス						18
+	HI,								// サービスエリア							19
+	HI,								// パーキングエリア							20
+	HI,								// ハイウェイラジオ							21
+
+	HI,								// 高速道制限速度切替地点 本線入口			22
+	HI,								// 高速道制限速度切替地点 本線出口			23
+	HI,								// 高速道制限速度切替地点 ジャンクション	24
+	HI,								// 高速道制限速度切替地点 本線				25
+	HI,								// 高速道制限速度切替地点 パーキング出口	26
+
+	HI,								// 駐車禁止取締り最重点エリア				27
+	HI,								// 駐車禁止取締り重点エリア					28
+	LO,								// 駐車場									29
+
+	HI,								// 固定キャンセルエリア						30
+	HI,								// 急カーブ									31
+	HI,								// 分岐・合流ポイント						32
+	HI,								// 県境										33
+	HI,								// 長いトンネル								34
+	HI,								// ETCレーン								35
+	HI,								// 急勾配									36
+	LO,								// 踏切										37
+
+	HI,								// ピン										38
+	HI,								// リンクユニット							39
+
+	HI,								// リアルタイム取締エリア					40
+	HI,								// とるぱ									41
+	LO,								// 一時停止ポイント							42
+	HI,								// 車上狙い多発エリア						43
+
+	HI,								// 非測位誘導データ							44
+	HI,								// 非測位RD式オービス						45
+	HI,								// 非測位Hシステム式オービス				46
+	HI,								// 非測位LHシステム式オービス				47
+	HI,								// 非測位ループコイル式オービス				48
+	HI,								// 非測位光電管式オービス					49
+
+	HI,								// 非測位取締エリア							50
+	HI,								// 非測位検問エリア							51
+
+	LO,								// 公衆トイレ								52
+	HI,								// 非測位センサ誘導データ					53
+	HI,								// 交番										54
+
+	LO,								// 消防署									55
+	LO,								// 保育園・幼稚園							56
+
+	LO,								// 高速バス停								55
+	HI,								// ゾーン30									56
+};
+
+

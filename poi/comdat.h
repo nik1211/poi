@@ -5,6 +5,8 @@
 #ifndef __COMDAT_H__
 #define __COMDAT_H__
 
+#include <limits.h>
+
 typedef	unsigned char	U1;
 typedef	unsigned short	U2;
 typedef unsigned long	U4;
@@ -68,6 +70,30 @@ typedef union{
 
 #define	OFF		0
 #define	ON		1
+
+#define	SMALL	0
+#define	LARGE	1
+
+#define	LO		0
+#define	HI		1
+
+#define	U1_MAX	UCHAR_MAX
+#define	U2_MAX	USHRT_MAX
+#define	U4_MAX	ULONG_MAX
+
+#define	S1_MAX	SCHAR_MAX
+#define	S1_MIN	SCHAR_MIN
+#define	S2_MAX	SHRT_MAX
+#define	S2_MIN	SHRT_MIN
+#define	S4_MAX	LONG_MAX
+#define	S4_MIN	LONG_MIN
+
+#ifndef NULL
+#define	NULL	0
+#endif
+
+// 絶対値差分算出マクロ
+#define	ABS_SUB(a,b)		((a >= b) ? (a-b) : (b-a))
 
 // 種番
 typedef enum{
@@ -401,6 +427,13 @@ typedef enum{
 // 誘導番号無効
 #define	u1_YUDO_NUM_INVALID	0
 
+typedef enum{
+	DIMMER_PHASE_NIGHT_OR_DAYLIGHT,
+	DIMMER_PHASE_NIGHT_TO_MORNING,
+	DIMMER_PHASE_MORNING_TO_DAYLIGHT,
+	DIMMER_PHASE_DAYLIGHT_TO_EVENING,
+	DIMMER_PHASE_EVENING_TO_NIGHT,
+}EM_DIMMER_PHASE;
 
 //--------------------------------------------------------------------------//
 //	型定義																	//
@@ -930,6 +963,76 @@ typedef struct{
 	UN_EXTRA	un_extra;
 }ST_ROMIMAGE;
 #pragma pack()
+
+// 衛星情報型
+#pragma pack(1)
+typedef struct{
+	U1		id;										// 0の時以下の情報は無効、GPS: 1(G1)-32(G32), GLONASS 65(R1)-96(R32), SBAS 120(S120)-151(S151), QZSS 193(Q1)-197(Q5)
+	S1		ev;										// [deg]
+	S2		az;										// [deg]
+	U1		cn;										// [dbHz]
+	U1		flg;									// bSvFlg
+#define	bSvFlgUsed				bit0					// SV is used for navigation
+#define	bSvFlgCorrct			bit1					// Differential correction data is available for this SV
+#define	bSvFlgEpAl				bit2					// Orbit information is available for this SV (Ephemeris or Almanach)
+#define	bSvFlgEp				bit3					// Orbit information is Ephemeris
+#define	bSvFlgUnhelth			bit4					// SV is unhealthy / shall not be used
+//								bit5
+//								bit6
+//								bit7
+#define	kSvFlgInvalid			(0xFF)					// flgを無効にする、bit0とbit4が同時に有効になることはないだろう
+}ST_SAT_INF;
+
+// GPS状態型
+typedef	struct{
+	U4			u4_carLat;					// 自車緯度 (単位：10^-3分)
+	U4			u4_carLon;					// 自車経度 (単位：10^-3分)
+	U2			u2_carDeg;					// 自車方位 (単位：0.1°)	
+	S2			s2_carHight;				// 自車高度 (単位：1m)
+	U2			u2_carSpd;					// 自車車速 (単位：0.1km/h)
+
+	U1			b_curSokui		:1;			// 現在の測位状態(モジュールデータそのまま)
+	U1			b_sysSokui		:1;			// システム測位状態(表示や音に使用する状態)
+	U1			b_degValid		:1;			// 方位有効フラグ
+	U1			b_hightValid	:1;			// 高度有効フラグ
+	U1			b_timValid		:1;			// 時刻有効フラグ
+	U1			b_timDim		:2;			// タイムディマー状態(EM_DIMMER)
+	U1			b_spdValid		:1;			// 速度確定フラグ
+
+	U1			b_gpsModSts		:3;			// GPSモジュール制御状態(EM_GPSMOD_STS)
+	U1			b_rsv1			:4;			// 旧：測位使用衛星数(0～12)
+	U1			b_sys1stFix		:1;			// システム1stFixフラグ
+
+	U1			u1_latarea;					// 緯度エリア
+	U2			u2_lonarea;					// 経度エリア
+
+	U1			u1_year;					// 年(2000年からのオフセット)
+	U1			u1_month;					// 月(1～12)
+	U1			u1_day;						// 日(1～31)
+	U1			u1_hour;					// 時(0～23)
+	U1			u1_min;						// 分(0～59)
+	U1			u1_sec;						// 秒(0～59)
+
+	U1 			b_carSpdValid   :1;     	// 自車速度有効(表示は"u2_carSpd" & "b_carSpdValid"で判断する)
+	U1			b_CarAveMaxSpdValid	:1;
+	U1			b_forceGyroDegUse	:1;
+	U1 			b_rsv           :5;     	// 
+
+	EM_DIMMER_PHASE	dim_phase;
+	U2			dim_sec_offs;
+	
+	U2			u2_carAveSpd;				// 平均速度
+	U2			u2_carMaxSpd;				// 最高速度
+
+#define	SAT_INF_NUM				40			// 衛星情報数
+	U1			u1_viewSatNum;				// 視野内衛星数
+	ST_SAT_INF	st_satInf[SAT_INF_NUM];		// 衛星情報
+
+}ST_GPS_STS;
+#pragma pack()
+#define	GPSMAP_MAX			500				// 最大ターゲットデータ数
+#define GPS_VISIBLE_TGT_MAX	150				// 可視ターゲット最大数
+#define	EXTRA_DATA_SIZE		8				// 拡張情報データ長
 
 #endif
 
