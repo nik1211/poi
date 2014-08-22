@@ -31,42 +31,6 @@ enum{
 	STS_ORBIS_50M,									// 50m警報状態
 };
 
-// マイエリア
-enum{
-	STS_MYAREA_NOALARM = 0,							// 非警報状態
-	STS_MYAREA_1100M,								// 1100m警報状態
-	STS_MYAREA_600M,								// 600m警報状態
-	STS_MYAREA_50M,									// 50m警報状態
-};
-// マイキャンセル
-enum{
-	STS_MYCANCEL_RNGOUT = 0,						// 圏外状態
-	STS_MYCANCEL_200M,								// 200m圏内
-	STS_MYCANCEL_200M_RD,							// 200m圏内(RD受信あり)
-};
-// 自動キャンセル
-enum{
-	STS_ATCANCEL_RNGOUT = 0,						// 圏外状態
-	STS_ATCANCEL_REG1ST,							// 登録1回目通過
-	STS_ATCANCEL_200M_NORD,							// 200m圏内(RD受信なし)
-	STS_ATCANCEL_100M_NORD,							// 100m圏内(RD受信なし)
-	STS_ATCANCEL_RDRX,								// 圏内RD受信あり
-	STS_ATCANCEL_AACDIS,							// 圏内AAC禁止
-};
-// 自動キャンセル登録
-typedef enum{
-	REGSTS_IDLE = 0,								// 登録・削除待ち状態
-	REGSTS_SRCHPOS,									// 30～150m位置サーチ状態
-	REGSTS_CHK300M,									// 300m圏内チェック状態
-	REGSTS_CHK500M,									// 500m圏内チェック状態
-}EM_ATCANCEL_REGSTS;
-
-// SCPコンテンツ状態定義
-enum{
-	STS_SCP_RNGOUT = 0,								// 圏外
-	STS_SCP_100M,									// 100m圏内状態
-	STS_SCP_50M,									// 50m圏内状態
-};
 // ワンショットコンテンツ状態定義
 enum{
 	STS_ONESHOTCONT_NOALARM = 0,
@@ -85,12 +49,6 @@ enum{
 	STS_AREACONT_INAREA,							// エリア内状態
 };
 
-// ETCゲート状態定義
-enum{
-	STS_ETC_NOPASS = 0,								// 未通過
-	STS_ETC_PASS,									// 通過
-};
-
 // 駐禁警報状態
 enum{
 	PCHK_WRN_OUT = 0,								// 圏外
@@ -107,13 +65,6 @@ enum{
 	ZONE30_WRN_IN_SNDOUT,							// 圏内音声出力済み
 };
 
-// 車上狙い状態
-enum{
-	SHAJYO_WRN_OUT = 0,								// 圏外
-	SHAJYO_WRN_IN_NOSNDOUT,							// 圏内音声未出力
-	SHAJYO_WRN_IN_SNDOUT,							// 圏内音声出力済み
-};
-
 // トンネル内オービス警報状態定義
 enum{
 	STS_TUNNEL_ORBIS_NOALARM = 0,
@@ -121,25 +72,6 @@ enum{
 	STS_TUNNEL_ORBIS_1100M,
 	STS_TUNNEL_ORBIS_600M,
 };
-
-// GPS処理フェーズ定義																	フェーズ進行
-typedef enum{										//									MAP更新あり		MAP更新なし		1stFix前
-	GPS_PHASE_WAIT = 0,								// 待ちフェーズ						0				0				0
-	GPS_PHASE_CHKMOV,								// 移動距離チェックフェーズ			1				1				-
-	GPS_PHASE_MAKMAP,								// MAP生成フェーズ					2				-				-
-	GPS_PHASE_MAKDYNAMIC_MAP,						// 動的データMAP生成フェーズ		3				-				-
-	GPS_PHASE_MAKCUSTOM_MAP,						// カスタムデータMAP生成フェーズ	4				-				-
-#if __FREE_DATA_DOWNLOAD__
-	GPS_PHASE_MAKPAY_MAP,							// 有料版データMAP生成フェーズ		4				-				-
-#endif
-	GPS_PHASE_CHGMAP,								// MAP変更チェックフェーズ			5				-				-
-	GPS_PHASE_CHKWRN,								// 警報判定フェーズ					6				2				-
-	GPS_PHASE_REG_MYAREA,							// マイエリア登録フェーズ			7				3				1
-	GPS_PHASE_REG_MYCANCEL,							// マイキャンセル登録フェーズ		8				4				2
-	GPS_PHASE_REG_ATCANCEL,							// オートキャンセル登録フェーズ		9				5				3
-	GPS_PHASE_EPILOGUE,								// 終了フェーズ						10				6				4
-	GPS_PHASE_MAX									// ガード値
-}EM_PHASE;
 
 // MAP生成フーズ中のサブフェーズ
 enum{
@@ -152,14 +84,6 @@ enum{
 #define	u4_LON_SPLIT_WIDTH		((U4)0x00000800)	// 経度分割幅
 #define	u2_DATA_SPLIT_NUM		((U2)576)			// データ分割数
 #define	u1_MAPDATA_SIZE			((U1)16)			// オービスROMデータサイズ
-#define	u4_CUSTOM_VIRTUAL_ADDR_TOP	((U4)0xFE000000)// カスタムデータ仮想アドレス先頭
-#define	u4_DYNAMIC_VIRTUAL_ADDR_TOP	((U4)0xFF000000)
-													// ダイナミック仮想アドレス先頭
-#define	u4_DYNAMIC_REAL_ADDR_MASK	((U4)0x00FFFFFF)
-													// ダイナミック実アドレスマスク
-#if __FREE_DATA_DOWNLOAD__
-#define	u4_PAY_VIRTUAL_ADDR_TOP	((U4)0xFD000000)	// 有料版データ仮想アドレス先頭
-#endif
 
 enum{
 	TYPE_LAT = 0,
@@ -204,29 +128,10 @@ enum{
 	VC_QUEUE_FULL,									// キューフル
 };
 
-typedef enum{
-	DYNAMIC_TYPE_MYAREA = 0,
-	DYNAMIC_TYPE_MYCANCEL,
-	DYNAMIC_TYPE_ICANCEL,
-	DYNAMIC_TYPE_CANCEL_ALL,
-	DYNAMIC_TYPE_ICANCEL_REMAKE,
-	DYNAMIC_TYPE_PIN,
-}EM_DYNAMIC_TYPE;
-
 enum{
 	RUNSTOP_INIT = 0,
 	RUNSTOP_RUN,
 	RUNSTOP_STOP,
-};
-
-enum{
-	GPS_RDSCOPE_NO_JUDGE = 0,				// 判定しない
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 通常判定タイプ
-	GPS_RDSCOPE_ETC_JUDGE,					// ETC判定タイプ
-	GPS_RDSCOPE_FAR_JUDGE,					// 遠方判定タイプ
-	GPS_RDSCOPE_ZONE_JUDGE,					// ゾーン判定タイプ
-	GPS_RDSCOPE_ORBIS_JUDGE,				// オービス判定タイプ
-	GPS_RDSCOPE_NOFIX_JUDGE,				// 非測位判定タイプ
 };
 
 #define	VIRTUAL_INDEX_TYPES		7
@@ -268,19 +173,6 @@ typedef enum{
 	MYREG_RET_REGOK_PTFULL,							// 登録できたがマップがフル
 	MYREG_RET_REGOK,								// 登録できた
 }EM_MYREG_RET;
-
-// 補完
-enum{
-	HOKAN_MODE_INIT = 0,
-	HOKAN_MODE_START,
-	HOKAN_MODE_CHK,
-	HOKAN_MODE_END,
-};
-enum{
-	ETC_GUIDE_OFF = 0,
-	ETC_GUIDE_ON,
-	ETC_GUIDE_OFF_WAIT,
-};
 
 // エリア状態
 enum{
@@ -683,9 +575,6 @@ static U1	u1_Gps100mContVcReq(ST_GPSMAP *, ST_VCGPS *);
 													// 100mタイプコンテンツボイス要求
 static U1	u1_GpsScpContVcReq(ST_GPSMAP *, ST_VCGPS *);
 													// 速度切替コンテンツボイス要求
-static U1	u1_GpsETCVcReq(ST_GPSMAP *, ST_VCGPS *);// ETCボイス要求
-static U1	u1_GpsMyAreaVcReq(ST_GPSMAP *, EM_VCGPS_TYPE, ST_VCGPS *);
-													// マイエリアボイス要求
 static U1	u1_GpsAreaVcReq(EM_VCGPS_TYPE, ST_VCGPS *);
 													// エリアボイス要求
 static U1	SubVcReqDir(S2 , ST_VCGPS *);			// サブ関数：ボイス方向処理
@@ -888,86 +777,6 @@ static void (*const fnc_TBL_TGTTRANS[])(EM_TGTDEG) = {
 
 	TransitDummy,							// 高速バス停				57
 	TransitZone30Type,						// ゾーン30					58
-};
-
-// GPSターゲットによるレーダースコープ判定テーブル
-static const U1	u1_TBL_GPSTGT_RDSCOPE_JUDGE[TGT_GUARD_MAX] = {
-
-	GPS_RDSCOPE_NO_JUDGE,					// dummy					0
-	GPS_RDSCOPE_ORBIS_JUDGE,				// RD式オービス				1
-	GPS_RDSCOPE_ORBIS_JUDGE,				// Hシステム式オービス		2
-	GPS_RDSCOPE_ORBIS_JUDGE,				// LHシステム式オービス		3
-	GPS_RDSCOPE_ORBIS_JUDGE,				// ループコイル式オービス	4
-	GPS_RDSCOPE_ORBIS_JUDGE,				// 光電式オービス			5
-	
-	GPS_RDSCOPE_ZONE_JUDGE,					// 取締エリア				6
-	GPS_RDSCOPE_ZONE_JUDGE,					// 検問エリア				7
-
-	GPS_RDSCOPE_NORMAL_JUDGE,				// Nシステム				8
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 交通監視システム			9
-
-	GPS_RDSCOPE_NORMAL_JUDGE,				// マイエリア				10
-	GPS_RDSCOPE_NORMAL_JUDGE,				// マイキャンセルエリア		11
-#if __ICON_ICANCEL_ON__
-	GPS_RDSCOPE_NORMAL_JUDGE,				// Iキャンセルエリア		12
-#else
-	GPS_RDSCOPE_NO_JUDGE,					// Iキャンセルエリア		12
-#endif
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 警察署					13
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 交差点監視ポイント		14
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 事故多発エリア			15
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 信号無視抑止システム		16
-
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 道の駅					17
-	GPS_RDSCOPE_NORMAL_JUDGE,				// ハイウェイオアシス		18
-	GPS_RDSCOPE_NORMAL_JUDGE,				// サービスエリア			19
-	GPS_RDSCOPE_NORMAL_JUDGE,				// パーキングエリア			20
-	GPS_RDSCOPE_NORMAL_JUDGE,				// ハイウェイラジオ			21
-
-	GPS_RDSCOPE_NO_JUDGE,					// SCP本線入口				22
-	GPS_RDSCOPE_NO_JUDGE,					// SCP本線出口				23
-	GPS_RDSCOPE_NO_JUDGE,					// SCPジャンクション		24
-	GPS_RDSCOPE_NO_JUDGE,					// SCP本線					25
-	GPS_RDSCOPE_NO_JUDGE,					// SCPパーキング出口		26
-
-	GPS_RDSCOPE_NO_JUDGE,					// 駐禁最重点エリア			27
-	GPS_RDSCOPE_NO_JUDGE,					// 駐禁重点エリア			28
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 駐車場					29
-
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 固定キャンセルエリア		30
-	GPS_RDSCOPE_NO_JUDGE,					// 急カーブ					31
-	GPS_RDSCOPE_NO_JUDGE,					// 分岐・合流ポイント		32
-	GPS_RDSCOPE_NO_JUDGE,					// 県境						33
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 長いトンネル				34
-	GPS_RDSCOPE_ETC_JUDGE,					// ETCレーン				35
-	GPS_RDSCOPE_NO_JUDGE,					// 急勾配					36
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 踏切						37
-	GPS_RDSCOPE_NORMAL_JUDGE,				// ユーザーピン				38
-	GPS_RDSCOPE_NO_JUDGE,					// リンクユニット			39
-	GPS_RDSCOPE_NO_JUDGE,					// リアルタイム取締エリア	40
-	GPS_RDSCOPE_NORMAL_JUDGE,				// とるぱ					41
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 一時停止					42
-	GPS_RDSCOPE_NO_JUDGE,					// 車上狙い多発エリア		43
-
-	GPS_RDSCOPE_NO_JUDGE,					// 非測位誘導データ				44
-	GPS_RDSCOPE_NOFIX_JUDGE,				// 非測位RD式オービス			45
-	GPS_RDSCOPE_NOFIX_JUDGE,				// 非測位Hシステム式オービス	46
-	GPS_RDSCOPE_NOFIX_JUDGE,				// 非測位LHシステム式オービス	47
-	GPS_RDSCOPE_NOFIX_JUDGE,				// 非測位ループコイル式オービス	48
-	GPS_RDSCOPE_NOFIX_JUDGE,				// 非測位光電管式オービス		49
-
-	GPS_RDSCOPE_NOFIX_JUDGE,				// 非測位取締エリア				50
-	GPS_RDSCOPE_NOFIX_JUDGE,				// 非測位検問エリア				51
-
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 公衆トイレ					52
-	GPS_RDSCOPE_NO_JUDGE,					// 非測位センサ誘導データ		53
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 交番							54
-
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 消防署						55
-	GPS_RDSCOPE_NORMAL_JUDGE,				// 保育園・幼稚園				56
-
-	GPS_RDSCOPE_NO_JUDGE,					// 高速バス停				57
-	GPS_RDSCOPE_NO_JUDGE,					// ゾーン30					58
 };
 
 // 駐禁状態変換
@@ -1649,12 +1458,6 @@ static U1	u1_RegMap(void){
 		pstt_mkmap->u1_areaStsRd = AREA_STATUS_OUT;
 		pstt_mkmap->u1_areaStsSc = AREA_STATUS_OUT;
 
-		if(sts_gpsrom.u1_type == TGT_ICANCEL){		// Iキャンセルのとき
-			if(sts_gpsrom.un_extra.dynamic.un_regday.hword == uns_today.hword){
-				pstt_mkmap->u1_wrnSts = STS_ATCANCEL_REG1ST;
-													// キャンセルさせない
-			}
-		}
 		memcpy(&pstt_mkmap->un_extra.byte[0], &sts_gpsrom.un_extra.byte[0], EXTRA_DATA_SIZE);
 													// EXTRA保存
 		// 登録完了
@@ -2742,37 +2545,6 @@ static void	TransitContAreaType(EM_TGTDEG emh_tgtDeg){
 //【備考】																	//
 //--------------------------------------------------------------------------//
 static void	TransitETCGateType(EM_TGTDEG emh_tgtDeg){
-
-	U1	u1t_degChk;
-	U1	u1t_ETCtype;
-	
-	u1t_ETCtype = psts_chkmap->un_extra.etc.b_pointType;
-	if(u1t_ETCtype == ETC_POINT_STOP){
-		u1t_degChk = u1_ChkDegRng(TYPE_TGTDEG_NOEXIST_BACK, psts_chkmap->u2_dst);
-	}
-	else{
-		u1t_degChk = u1_ChkDegRng(emh_tgtDeg, psts_chkmap->u2_dst);
-	}
-
-	// 状態遷移
-	if(psts_chkmap->u1_wrnSts == STS_ETC_NOPASS){			// 非通過状態
-		if((psts_chkmap->u2_dst <= u2_DIST_100M)			// 距離範囲内 and
-		&& (u1t_degChk == OK)){								// (ターゲット対向 or 方位無視)
-			psts_chkmap->u1_wrnSts = STS_ETC_PASS;			// 通過状態へ
-			if(u1t_ETCtype == ETC_POINT_STOP){
-				F_ETC_STOP = TRUE;
-			}
-			else{
-				F_ETC_START = TRUE;
-				sts_ETC_guide_point = *psts_chkmap;			// ガイド情報を保存
-			}
-		}
-	}
-	else{
-		if(psts_chkmap->u2_dst > u2_DIST_600M){				// 600m範囲外に出た？
-			psts_chkmap->u1_wrnSts = STS_ETC_NOPASS;		// 非警報状態へ
-		}
-	}
 }
 
 //--------------------------------------------------------------------------
@@ -3618,59 +3390,6 @@ static void TransitZone30Sts(void){
 //【備考】																	
 //--------------------------------------------------------------------------
 static void	TransitShajyoSts(void){
-
-	// 設定OFFなら初期化
-	if(stg_setGps[u1g_setAcsSel].b_shajyoArea == OFF){			// 設定OFF ?
-		u1s_shajyoAreaSts = SHAJYO_WRN_OUT;						// 圏外にする
-		return;
-	}
-
-	switch(u1s_shajyoAreaSts){
-	case SHAJYO_WRN_OUT:										// エリア外
-		if(F_SHAJYO_IN){										// エリア内 ?
-			if(u1s_runStopSts == RUNSTOP_STOP){					// 走行後停車 ?
-				u1s_shajyoAreaSts = SHAJYO_WRN_IN_SNDOUT;		// 圏内音声出力済みへ
-				// 仮想マップ更新
-				sts_gpsmap[TZ_VIRTUAL_INDEX].un_type.bit.b_code = TGT_SHAJYOU_AREA;
-				sts_gpsmap[TZ_VIRTUAL_INDEX].u4_dataAddr = TZ_VIRTUAL_ADDRESS;
-				sts_gpsmap[TZ_VIRTUAL_INDEX].un_extra.shajyou.u2_mapPctNum = 0;
-				// 音声キュー格納要求
-				GpsVcEnQueue(VC_GPSVAR, VCGPS_SHAJYO_AREA, TZ_VIRTUAL_ADDRESS);
-			}
-			else{
-				u1s_shajyoAreaSts = SHAJYO_WRN_IN_NOSNDOUT;		// 圏内音声未出力へ
-			}
-		}
-		break;
-
-	case SHAJYO_WRN_IN_NOSNDOUT:								// 圏内で音声未出力
-		if(!F_SHAJYO_IN){										// 圏外へ離脱
-			u1s_shajyoAreaSts = SHAJYO_WRN_OUT;					// 圏外へ
-		}
-		else{													// 圏内継続
-			if(u1s_runStopSts == RUNSTOP_STOP){					// 走行後停車 ?
-				u1s_shajyoAreaSts = SHAJYO_WRN_IN_SNDOUT;		// 圏内音声出力済みへ
-				// 仮想マップ更新
-				sts_gpsmap[TZ_VIRTUAL_INDEX].un_type.bit.b_code = TGT_SHAJYOU_AREA;
-				sts_gpsmap[TZ_VIRTUAL_INDEX].u4_dataAddr = TZ_VIRTUAL_ADDRESS;
-				sts_gpsmap[TZ_VIRTUAL_INDEX].un_extra.shajyou.u2_mapPctNum = 0;
-				// 音声キュー格納要求
-				GpsVcEnQueue(VC_GPSVAR, VCGPS_SHAJYO_AREA, TZ_VIRTUAL_ADDRESS);
-			}
-		}
-		break;
-
-	case SHAJYO_WRN_IN_SNDOUT:									// 圏内で音声出力済み
-		if(!F_SHAJYO_IN){										// 圏外へ離脱
-			u1s_shajyoAreaSts = SHAJYO_WRN_OUT;					// 圏外へ
-		}
-		break;
-
-	default:
-		u1s_shajyoAreaSts = SHAJYO_WRN_OUT;
-		break;
-	}
-
 }
 
 //--------------------------------------------------------------------------
@@ -4443,78 +4162,6 @@ static U1	u1_GpsScpContVcReq(ST_GPSMAP *psth_map, ST_VCGPS *psth_vcGps){
 
 	return	OK;
 }
-//--------------------------------------------------------------------------
-//【関数】ETCボイス要求処理													
-//【機能】ETCの音声情報を作成して出力要求する								
-//【引数】psth_map : 判定マップ												
-//【戻値】U1 OK：出力する  													
-//【備考】																	
-//--------------------------------------------------------------------------
-static U1	u1_GpsETCVcReq(ST_GPSMAP *psth_map, ST_VCGPS *psth_vcGps){
-
-	if(u1s_ETC_guide_sts == ETC_GUIDE_OFF){				// 既にガイドOFF
-		return NG;
-	}
-
-	if(psth_map->un_extra.etc.b_ETCGuide == ETC_GUIDE_LANE_NONE){
-														// レーンなしデータなら
-		return NG;
-	}
-
-	// (1)共通：種類
-	psth_vcGps->common.u1_trgt = VCTGT_ETC;
-	// (2)共通：トンネル
-	psth_vcGps->common.b_tunnel = (U1)psth_map->un_type.bit.b_tunnel;
-	// (3)共通：方向
-	psth_vcGps->common.b_dir = VCDIR_NONE;				// 言わない
-	// (4)共通：距離
-	psth_vcGps->common.b_dist = VCDIST_NONE;			// 言わない
-	// (5)共通：高速
-	psth_vcGps->common.b_highway = OFF;					// 高速道を言わない
-	// (6)拡張：レーンガイド情報
-	psth_vcGps->extra.etc.b_etc = ON;
-	psth_vcGps->extra.etc.etcGuide = psth_map->un_extra.etc.b_ETCGuide;
-
-	return OK;
-}
-
-//--------------------------------------------------------------------------
-//【関数】マイエリアボイス要求処理											
-//【機能】マイエリアの音声情報を作成して出力要求する						
-//【引数】psth_map : 判定マップポインタ										
-//        emh_typ  : ボイスタイプ											
-//【戻値】U1 OK：出力する  NG：出力しない									
-//【備考】非対向、1km警報の600m距離既到達の場合は出力しない					
-//--------------------------------------------------------------------------
-static U1	u1_GpsMyAreaVcReq(ST_GPSMAP *psth_map, EM_VCGPS_TYPE emh_typ, ST_VCGPS *psth_vcGps){
-
-	// すでに通過音声が要求された後の場合はすべて棄却する
-	if(psth_map->u1_wrnSts == STS_MYAREA_50M){
-		return NG;
-	}
-
-	// (1)共通：種類
-	psth_vcGps->common.u1_trgt = VCTGT_MYAREA;
-
-	// (3)共通：トンネル
-	psth_vcGps->common.b_tunnel = NOT_TUNNEL;
-
-	// (4)共通：方向
-	if(SubVcReqDir(psth_map->s2_degB, psth_vcGps) == NG){
-		return NG;
-	}
-	// (5)距離
-	if(emh_typ == VCGPS_MYAREA_1KM){
-		if(SubVcReqUpper500m(psth_map->u2_dst, psth_vcGps) == NG){
-			return NG;
-		}
-	}
-	else{
-		SubVcReqUnder500m(psth_map->u2_dst, psth_vcGps);
-	}
-
-	return	OK;
-}
 
 //--------------------------------------------------------------------------
 //【関数】エリアボイス要求処理												
@@ -4541,12 +4188,6 @@ static U1	u1_GpsAreaVcReq(EM_VCGPS_TYPE emh_typ, ST_VCGPS *psth_vcGps){
 		psth_vcGps->common.u1_trgt = VCTGT_Z_AREA;
 		break;
 
-	case VCGPS_SHAJYO_AREA:
-		if(u1s_shajyoAreaSts != SHAJYO_WRN_IN_SNDOUT){	// すでに該当エリア外なら中止
-			return NG;
-		}
-		psth_vcGps->common.u1_trgt = VCTGT_SHAJYO_AREA;
-		break;
 	case VCGPS_ZONE30_AREA:
 		if(u1s_zone30AreaSts != ZONE30_WRN_IN_SNDOUT){		// すでに該当エリア外なら中止{
 			return NG;
@@ -4686,61 +4327,6 @@ void	GpsVcEnQueue(EM_VC u1h_voice, EM_VCGPS_TYPE emh_vcType, U4 u4h_addr){
 			pstt_queue_ctrl->sts = VC_QUEUE_DATON;
 		}
 	}
-}
-
-//--------------------------------------------------------------------------//
-//【関数】方向音声再判定処理												//
-//【機能】発音直前の方向に従って決める										//
-//【入力】u2s_sndTgtNum														//
-//【出力】VCDIR_FWRD, VCDIR_LEFT, VCDIR_RIGHT, VCDIR_CANT_REJUDGE			//
-//【備考】マップと音声ターゲット番号のマッチングが取れない期間は再判定不可	//
-//		  で返し、あらかじめ予定した方向で出力させる						//
-//--------------------------------------------------------------------------//
-U1	u1_GetCurVcDir(void){
-
-	S2			s2t_degB;
-	U1			u1t_ret = VCDIR_CANT_REJUDGE;
-
-	if(u1s_gpsctl_phase == GPS_PHASE_WAIT){
-
-		s2t_degB = sts_gpsmap[u2s_sndTgtNum].s2_degB;		// 音声出力ターゲットの内容参照
-		if(s2t_degB < s2_DEG_TGTLEFT_MIN){
-			u1t_ret = VCDIR_LEFT;
-		}
-		else if(s2t_degB > s2_DEG_TGTRIGHT_MIN){
-			u1t_ret = VCDIR_RIGHT;
-		}
-		else{
-			u1t_ret = VCDIR_FWRD;
-		}
-	}
-
-	return	u1t_ret;
-}
-//--------------------------------------------------------------------------//
-//【関数】カウントダウン距離音声再判定処理									//
-//【機能】発音直前の距離により発音するか否か決定する						//
-//【入力】u2s_sndTgtNum														//
-//【出力】TRUE/FALSE														//
-//【備考】マップと音声ターゲット番号のマッチングが取れない期間は再判定不可	//
-//        要求した音声より100m以上進んでいたらキャンセル					//
-//--------------------------------------------------------------------------//
-Bool	Is_GpsCountDownOK(U2 req_dist)
-{
-
-	Bool ret = TRUE;
-	U2 dist = 0;
-
-	if(u1s_gpsctl_phase == GPS_PHASE_WAIT){
-
-		dist = sts_gpsmap[u2s_sndTgtNum].u2_dst + 100;		// +100mを算出
-		if(dist > req_dist)
-		{
-			ret = FALSE;
-		}
-	}
-
-	return ret;
 }
 
 //--------------------------------------------------------------------------//
