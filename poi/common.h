@@ -1,9 +1,8 @@
 //--------------------------------------------------------------------------
 //	共通ヘッダファイル														
 //--------------------------------------------------------------------------
-
-#ifndef __COMMON_H__
-#define __COMMON_H__
+#ifndef	__COMMON_H__
+#define	__COMMON_H__
 
 #include <limits.h>
 
@@ -13,6 +12,7 @@ typedef unsigned long	U4;
 typedef signed	char	S1;
 typedef	signed	short	S2;
 typedef	signed	long	S4;
+
 typedef int Bool;
 
 // 1byte ビットフィールﾄﾞ共用体
@@ -82,20 +82,20 @@ typedef union{
 	}bit;
 }F4;
 
-#define	NG		0
-#define	OK		1
+#define	OFF		0
+#define	ON		1
 
 #define	FALSE	0
 #define	TRUE	1
 
-#define	OFF		0
-#define	ON		1
+#define	LO		0
+#define	HI		1
+
+#define	NG		0
+#define	OK		1
 
 #define	SMALL	0
 #define	LARGE	1
-
-#define	LO		0
-#define	HI		1
 
 #define	U1_MAX	UCHAR_MAX
 #define	U2_MAX	USHRT_MAX
@@ -112,8 +112,25 @@ typedef union{
 #define	NULL	0
 #endif
 
+// 演算マクロ
+// ガード付きデクリメントマクロ
+#define	DECCNT(cnt)	((cnt != 0) ? --cnt : cnt)
+// ガード付きインクリメントマクロ
+#define	INCCNTU1(cnt)	((cnt < 0xFF) ? ++cnt : cnt)
+#define	INCCNTU2(cnt)	((cnt < 0xFFFF) ? ++cnt : cnt)
+#define	INCCNTU4(cnt)	((cnt < 0xFFFFFFFF) ? ++cnt : cnt)
+
+// ガード付き減算
+#define	GRDSUB(a,b)		((a >= b) ? (a-b) : 0)
+// ガード付き加算
+#define	GRDADDU1(a,b)	((((U2)a+(U2)b) <= (U2)U1_MAX) ? ((U1)a+(U1)b) : U1_MAX)
+#define	GRDADDU2(a,b)	((((U4)a+(U4)b) <= (U4)U2_MAX) ? ((U2)a+(U2)b) : U2_MAX)
+#define	GRDADDU4(a,b)	(((U4_MAX - (U4)(a)) <= (U4)(b)) ? ((U4)(a)+(U4)(b)) : U4_MAX)
+
 // 絶対値差分算出マクロ
 #define	ABS_SUB(a,b)		((a >= b) ? (a-b) : (b-a))
+
+#define ABSO(x) ((x) >= 0 ? (x) : (-(x)))
 
 #endif
 

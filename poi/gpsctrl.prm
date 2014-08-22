@@ -78,6 +78,21 @@
 #define	VC_MIDPRI_QUEUE_STA			VCGPS_ZONE_1KM
 #define	VC_LOPRI_QUEUE_STA			VCGPS_SCPCONT
 
+#define	INTREG_DELLVL		((U1)5)						// 削除するRD受信レベル
+
+#define	u2_HIGH2NORM_SPD	((U2)(40*SPD_LSB))			// 一般判定速度
+#define	u2_NORMVALID_SPD	((U2)(10*SPD_LSB))			// 一般確定速度
+#define	u2_RUN_CONT_TIM		((U2)(60000/GPSCTL_LSB2))	// 走行継続時間
+#define	u1_STOP_CONT_TIM	((U1)(10000/GPSCTL_LSB2))	// 低速継続時間
+#define	u2_SCP_NOPASS_TIM	((U2)(600000/GPSCTL_LSB2))	// SCP非通過時間(10分で一般判定中へ)
+#define	u2_SCP_NOPASS_TIM2	((U2)(900000/GPSCTL_LSB2))	// SCP非通過時間2(15分で一般へ)
+
+#define	u1_RUN_NOSOKUI_TIM	((U1)(5000/GPSCTL_LSB2))	// 走行非測位時間
+
+#define	u1_STOP_NOSOKUI_TIM	((U1)(5000/GPSCTL_LSB2))	// 停車非測位時間
+
+#define	u2_NOGPSFAIL_TIM	((U2)(15000/GPSCTL_LSB))	// GPSフェール告知禁止時間
+
 //--------------------------------------------------------------------------
 // const data定義															
 //--------------------------------------------------------------------------
@@ -363,6 +378,17 @@ const U2	u2_TBL_LON2MTR[] = {
 	(U2)1314,
 };
 
+// 駐禁監視重点エリア・車上狙い多発エリアの判定距離変換テーブル
+static const U2	u2_TBL_AREA_ROUND[] = {
+	u2_DIST_500M,					// 000
+	u2_DIST_1000M,					// 001
+	u2_DIST_1500M,					// 010
+	u2_DIST_2000M,					// 011
+	u2_DIST_2500M,					// 100
+	u2_DIST_500M,					// 101(Reserved)
+	u2_DIST_500M,					// 110(Reserved)
+	u2_DIST_500M,					// 111(Reserved)
+};
 // 種番別データ優先度テーブル
 static const U1	u1_TBL_MAPPRI[TGT_GUARD_MAX] = 
 {

@@ -4,6 +4,46 @@
 
 #include "comdat.h"
 
+// GPSボイスタイプ
+
+typedef enum{
+	VCGPS_NON_TARGET = 0,							// 非ターゲットタイプ(測位音他)		優先度高
+	VCGPS_ORBIS_2KM,								// オービス2km						優先度高
+	VCGPS_ORBIS_1KM,								// オービス1km						優先度高
+	VCGPS_ORBIS_500M,								// オービス500m						優先度高
+	VCGPS_ORBIS_PASSSPD,							// オービス通過速度					優先度高
+	VCGPS_ORBIS_COUNTDOWN100,
+	VCGPS_ORBIS_COUNTDOWN200,
+	VCGPS_ORBIS_COUNTDOWN300,
+	VCGPS_ORBIS_COUNTDOWN400,
+	VCGPS_ORBIS_COUNTDOWN500,
+	VCGPS_ORBIS_COUNTDOWN600,
+	VCGPS_ORBIS_COUNTDOWN700,
+	VCGPS_ORBIS_COUNTDOWN800,
+	VCGPS_ORBIS_COUNTDOWN900,
+	VCGPS_MYAREA_1KM,								// マイエリア1km					優先度高
+	VCGPS_MYAREA_500M,								// マイエリア500m					優先度高
+
+	VCGPS_ZONE_1KM,									// ゾーン1km						優先度中
+	VCGPS_ZONE_500M,								// ゾーン500m						優先度中
+	VCGPS_ZONE_100M,								// ゾーン100m						優先度中
+	VCGPS_ZONE_OUT,									// ゾーン圏外						優先度中
+	VCGPS_1KMCONT_1KM,								// 1km系コンテンツ1km				優先度中
+	VCGPS_1KMCONT_500M,								// 1km系コンテンツ500m				優先度中
+	VCGPS_500MCONT,									// 500m系コンテンツ					優先度中
+	VCGPS_300MCONT,									// 300m系コンテンツ					優先度中
+	VCGPS_100MCONT,									// 100m系コンテンツ					優先度中
+	VCGPS_ETC,										// ETC								優先度中
+
+	VCGPS_SCPCONT,									// 速度切替コンテンツ				優先度低
+	VCGPS_PCHK_SZ_AREA,								// 駐禁最重点エリア					優先度低
+	VCGPS_PCHK_Z_AREA,								// 駐禁重点エリア					優先度低
+	VCGPS_SHAJYO_AREA,								// 車上狙い多発エリア				優先度低
+	VCGPS_ZONE30_AREA,								// ゾーン30エリア					優先度低
+
+	VCGPS_NONE,
+}EM_VCGPS_TYPE;
+
 //--------------------------------------------------------------------------
 //  外部公開マクロ
 //--------------------------------------------------------------------------
