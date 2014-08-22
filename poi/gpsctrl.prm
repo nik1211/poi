@@ -345,6 +345,24 @@ static const U1	em_TBL_DISTRNG[TGT_GUARD_MAX][2] = {
 	{	DISTRNG_2500M,		DISTRNG_2500M		},		// ゾーン30						58
 };
 
+// 緯度(LSB 0.001分)→距離(LSB 0.001m)変換テーブル
+const U2	u2_TBL_LAT2MTR[] = {
+	(U2)1846,
+	(U2)1847,
+	(U2)1849,
+	(U2)1850,
+	(U2)1852,
+};
+
+// 経度(LSB 0.001分)→距離(LSB 0.001m)変換テーブル
+const U2	u2_TBL_LON2MTR[] = {
+	(U2)1682,
+	(U2)1608,
+	(U2)1522,
+	(U2)1423,
+	(U2)1314,
+};
+
 // 種番別データ優先度テーブル
 static const U1	u1_TBL_MAPPRI[TGT_GUARD_MAX] = 
 {

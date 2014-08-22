@@ -70,5 +70,13 @@ typedef struct{
 
 #define	LATAREA_MAX			((U1)4)						// 緯度エリア最大値
 
+// POI設定セレクト
+enum{
+	SEL_POI_NORMAL = 0,
+	SEL_POI_TUNNEL,
+};
+
+void PoiSample(const char* fname, U2 dataSpec);
+
 #endif
 

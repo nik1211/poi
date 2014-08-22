@@ -5,95 +5,7 @@
 #ifndef __COMDAT_H__
 #define __COMDAT_H__
 
-#include <limits.h>
-
-typedef	unsigned char	U1;
-typedef	unsigned short	U2;
-typedef unsigned long	U4;
-typedef signed	char	S1;
-typedef	signed	short	S2;
-typedef	signed	long	S4;
-typedef int Bool;
-
-typedef union{
-	U4  dword;
-	U4	word;
-	struct{
-		U2	lo;
-		U2	hi;
-	}hword;
-	U1	byte[4];
-	struct{
-		U4	bit00:1;
-		U4	bit01:1;
-		U4	bit02:1;
-		U4	bit03:1;
-		U4	bit04:1;
-		U4	bit05:1;
-		U4	bit06:1;
-		U4	bit07:1;
-
-		U4	bit08:1;
-		U4	bit09:1;
-		U4	bit10:1;
-		U4	bit11:1;
-		U4	bit12:1;
-		U4	bit13:1;
-		U4	bit14:1;
-		U4	bit15:1;
-
-		U4	bit16:1;
-		U4	bit17:1;
-		U4	bit18:1;
-		U4	bit19:1;
-		U4	bit20:1;
-		U4	bit21:1;
-		U4	bit22:1;
-		U4	bit23:1;
-
-		U4	bit24:1;
-		U4	bit25:1;
-		U4	bit26:1;
-		U4	bit27:1;
-		U4	bit28:1;
-		U4	bit29:1;
-		U4	bit30:1;
-		U4	bit31:1;
-	}bit;
-}F4;
-
-#define	NG		0
-#define	OK		1
-
-#define	FALSE	0
-#define	TRUE	1
-
-#define	OFF		0
-#define	ON		1
-
-#define	SMALL	0
-#define	LARGE	1
-
-#define	LO		0
-#define	HI		1
-
-#define	U1_MAX	UCHAR_MAX
-#define	U2_MAX	USHRT_MAX
-#define	U4_MAX	ULONG_MAX
-
-#define	S1_MAX	SCHAR_MAX
-#define	S1_MIN	SCHAR_MIN
-#define	S2_MAX	SHRT_MAX
-#define	S2_MIN	SHRT_MIN
-#define	S4_MAX	LONG_MAX
-#define	S4_MIN	LONG_MIN
-
-#ifndef NULL
-#define	NULL	0
-#endif
-
-// 絶対値差分算出マクロ
-#define	ABS_SUB(a,b)		((a >= b) ? (a-b) : (b-a))
+#include "common.h"
 
 // 種番
 typedef enum{
@@ -434,6 +346,22 @@ typedef enum{
 	DIMMER_PHASE_DAYLIGHT_TO_EVENING,
 	DIMMER_PHASE_EVENING_TO_NIGHT,
 }EM_DIMMER_PHASE;
+
+// システム警報レベル定義
+typedef enum{
+	SYS_NO_WARNING = 0,								// 警報なし
+
+	SYS_SC_WARNING_LO,								// 無線警報(弱)
+	SYS_RED_WARNING_LO,								// GPS赤警報(弱)
+	SYS_YELLOW_WARNING_MID,							// GPS黄警報(中)
+	SYS_SC_WARNING_MID,								// 無線警報(中)
+	SYS_RED_WARNING_MID,							// GPS赤警報(中)
+	SYS_YELLOW_WARNING_HI,							// GPS黄警報(強)
+	SYS_RED_WARNING_HI,								// GPS赤警報(強)
+	SYS_SC_WARNING_HI,								// 無線警報(強)
+	SYS_RD_WARNING,									// RD警報
+
+}EM_SYS_WARNING_LVL;
 
 //--------------------------------------------------------------------------//
 //	型定義																	//
@@ -1033,6 +961,7 @@ typedef	struct{
 #define	GPSMAP_MAX			500				// 最大ターゲットデータ数
 #define GPS_VISIBLE_TGT_MAX	150				// 可視ターゲット最大数
 #define	EXTRA_DATA_SIZE		8				// 拡張情報データ長
+#define	TGTNUM_NOTGT	U2_MAX				// 対象ターゲットなし
 
 #endif
 

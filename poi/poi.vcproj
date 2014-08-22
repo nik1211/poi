@@ -48,6 +48,7 @@
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -171,19 +172,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\crypt.cpp"
+				RelativePath=".\crypt.c"
 				>
 			</File>
 			<File
-				RelativePath=".\gpsctl.cpp"
+				RelativePath=".\gpsctl.c"
 				>
 			</File>
 			<File
-				RelativePath=".\poi.cpp"
+				RelativePath=".\poi.c"
 				>
 			</File>
 			<File
-				RelativePath=".\readTest.cpp"
+				RelativePath=".\poiDataReadSample.c"
 				>
 			</File>
 			<File
@@ -207,7 +208,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\validate.cpp"
+				RelativePath=".\validate.c"
 				>
 			</File>
 		</Filter>
