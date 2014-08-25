@@ -11,8 +11,6 @@
 //--------------------------------------------------------------------------//
 // 設定値アクセス選択
 typedef enum{
-	SET_ACS_LCL = 0,						// ローカルモード設定値
-	SET_ACS_DRV,							// ドライブモード設定値
 	SET_ACS_ALL,							// オールONモード設定値
 	SET_ACS_NORMAL,							// ノーマル設定値
 	SET_ACS_MINIMUM,						// ミニマム設定値
@@ -92,95 +90,14 @@ typedef struct{
 
 // その他設定
 typedef struct{
-
-	U1			b_areaMode		:2;			// エリアモード(EM_SET_AREA)
-	U1			b_voiceMode		:2;			// 音声モード(EM_VOICE_MODE)
-	U1			b_panelMode		:2;			// パネルモード(EM_PANEL_MODE)
-	U1			b_spdWarn		:2;			// 速度警告(EM_SET_SPDWRN)
-
-	U1			b_idvOrbisVoice	:1;			// 個別オービスボイス(ON/OFF)
-	U1			b_scClassic		:1;			// 無線クラシック(ON/OFF)
-	U1			b_voiceType		:3;			// 音声タイプ(EM_VOICE_TYPE)
-	U1			b_photo_zoom	:2;			// 写真ズーム方式(EM_PHOTO_ZOOM)
-	U1			b_in_photo_clock:1;			// 写真内時計(ON/OFF)
-
-	U1			b_photo_effect	:3;			// 写真エフェクト(EM_PHOTO_EFFECT)
-	U1			b_photo_chgtim	:3;			// 写真切替時間(EM_PHOTO_CHGTIM)
-	U1			b_photo_color	:2;			// 写真色(EM_PHOTO_COLOR)
-	
-	U1			b_settingMode	:3;			// システム設定記憶(EM_SETTING_MODE)
-	U1			b_brightness	:2;			// 明るさ(EM_BRIGHTNESS)
-	U1			b_relaxChime	:2;			// リラックスチャイム(EM_RELAX_CHIME)
-	U1			b_oprtSnd		:1;			// 操作音(ON/OFF)
-
-	U1			b_dspRev		:1;			// 画面反転(ON/OFF)
-	U1			b_vol			:3;			// 音量設定(0～7 大きい程音量大)
-	U1			b_manner		:1;			// マナーモード(ON/OFF)
-	U1			b_headingUp		:1;			// レーダー画面の表示形式(EM_HEADING_UP)
-	U1			b_wrnDspChg		:2;			// 警報表示切り替え(EM_DSP_CHG_PT)
-
-	U1			b_logDisp		:1;			// ログのパーセント表示（ON/OFF）
-	U1			b_wrnPhoto		:1;			// 警報写真表示(ON/OFF)
-	U1			b_lcdDsp		:1;			// LCD表示(ON/OFF)
-	U1			b_logFunc		:1;			// ログ機能(ON/OFF)
-	U1			b_obdIllCtrl	:1;			// OBDイルミコントロール(ON/OFF)
-	U1							:1;			// 空き
-	U1			b_demo			:2;			// 店頭デモ(EM_SET_DEMO)
-
-	U1			b_wtDsp			:5;			// 待受画面(EM_SET_WTDSP)
-	U1			b_tideAuto		:1;			// 検潮所自動選択(ON/OFF)
-	U1			b_ledmode		:2;			// LED(EM_LED_MODE)
-
-	U1			b_rdSnd			:5;			// レーダー警報音設定(EM_SET_RDSND)
-	U1			b_rdSens		:3;			// レーダー受信感度モード設定(EM_SET_SENS)
-
 	U1			b_roadSel		:2;			// GPS道路選択設定(EM_SET_ROAD)
-	U1			b_sc			:2;			// 無線警報設定(EM_SET_SC)
-	U1			b_sokuiAna		:1;			// 測位アナウンス(ON/OFF)
-	U1			b_dispAlways	:1;			// 常時表示(ON/OFF)
-	U1			b_jiho			:1;			// 時報(ON/OFF)
-	U1			b_dimmer		:1;			// ディマー(EM_SET_FLEX_DIMMER)
-
-	U1			u1_car_maker;				// 車両メーカー
-
-	U2			u2_observer;				// 検潮所番号
-	
-	U1			b_mapMode		:3;			// マップモード(EM_SET_MAP_MODE)
-	U1							:1;			// 空き
-	U1			b_movSmoothing	:1;			// 移動スムージング(ON/OFF)
-	U1			b_mapScrollFocus:1;			// スクロールフォーカス(ON/OFF)
-	U1			b_wideRangeSrch	:1;			// ターゲットワイドレンジサーチ(ON/OFF)
-	U1			b_mapZoom		:1;			// ズーム表示
-
-	U1			u1_classicScopeMtr;
-	
-	union{
-		U1		u1_mapIcon;											// 地図アイコン表示
-		
-		struct{
-			U1			etc									:1;		// その他
-			U1			cv									:1;		// コンビニ
-			U1			ff									:1;		// ファーストフード
-			U1			fr									:1;		// ファミレス
-			U1			gs									:1;		// ガソリンスタンド
-		}b_mapIcon;
-	};
-	
-	U1			u1_turnOnPhoto;				// ターンオン写真
-	
-	U1			b_roadPres		:1;			// 道路気圧設定(ON/OFF)
-	U1			b_WLAN			:1;			// WLAN設定(ON/OFF)
-	U1			b_turnOnMovie	:3;			// ターンオンムービー(EM_TURNON_MOVIE)
-	U1			b_auto_chgtim	:3;			// 待受AUTO切替時間(EM_AUTO_CHGTIM)
-	
-	U1			b_scopeType		:2;			// スコープタイプ(EM_SET_SCOPE_TYPE)
-	U1			b_toriDisp		:2;			// 公開取締表示(EM_SET_TORI_DISP)
-	U1			b_mapColor		:2;			// マップ色(EM_SET_MAP_COLOR)
-	U1			b_lei			:1;			// Lei mode
-	U1			b_leiCharaSD	:1;			// Lei キャラnormal,SD(ちびレイ)
-	U1			rsv00[12];
-
 }ST_SET_MISC;
+
+extern ST_SET_GPS				stg_setGps[SET_ACS_MAX];		// GPS設定値
+extern ST_SET_MISC				stg_setMisc;					// その他設定値
+extern EM_ACS_SEL				u1g_setAcsSel;					// 設定値選択
+
+extern void	SetMgrInit();
 
 #endif
 

@@ -361,9 +361,6 @@ static float k_lon2_meter;
 
 static U4	u4s_live_counter;
 
-ST_SET_GPS				stg_setGps[SET_ACS_MAX];		// GPS設定値
-ST_SET_MISC				stg_setMisc;					// その他設定値
-U1						u1g_setAcsSel;					// 設定値選択
 static FILE	*gpsDataFile;
 const char	*gpspoi_filename;
 static U2	u2g_dataSpec;
@@ -649,6 +646,8 @@ void PoiSample(const char* fname, U2 dataSpec){
 	gpspoi_filename = fname;
 	u2g_dataSpec = dataSpec;
 
+	SetMgrInit();
+
 	sts_gpsinf.lat = 2107021;
 	sts_gpsinf.lon = 8220672;
 	u2s_lonarea_old = U2_MAX;						// 前回経度エリア範囲外に
@@ -933,7 +932,7 @@ static void PhaseChkWrn(void){
 	}
 
 	// 道路判定処理
-	// RoadJudge();
+	RoadJudge();
 
 	// 駐禁エリアの遷移処理
 	TransitPchkSts();
@@ -3095,15 +3094,6 @@ static U1	u1_GpsOrbisVcReq(ST_GPSMAP *psth_map, EM_VCGPS_TYPE emh_typ, ST_VCGPS 
 			}
 			else{										// 1km以外
 				SubVcReqUnder500m(psth_map->u2_dst, psth_vcGps);
-			}
-		}
-
-		if(emh_typ == VCGPS_ORBIS_500M){
-			if((stg_setMisc.b_idvOrbisVoice)
-			&& (psth_map->un_extra.orbis.u2_voiceNum <= INDIV_ORBIS_PHRASE_MASK)){
-				psth_vcGps->common.b_idvVc = ON;
-				psth_vcGps->extra.orbis.idvVoiceLo = (U1)(psth_map->un_extra.orbis.u2_voiceNum & 0x00FF);
-				psth_vcGps->extra.orbis.idvVoiceHi = (U1)((psth_map->un_extra.orbis.u2_voiceNum & 0x0700) >> 8);
 			}
 		}
 

@@ -188,6 +188,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SetMgr.c"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
