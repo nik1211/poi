@@ -156,18 +156,6 @@ enum{
 	ZN30_VIRTUAL_ADDRESS,
 };
 
-enum{
-	INDX_RDRX_OFF = 0,
-	INDX_RDRX_ON,
-};
-
-enum{
-	GPSTGT_VC_STS_INIT = 0,							// 初期状態
-	GPSTGT_VC_STS_FIXOUTWT,							// 測位音出力待ち状態
-	GPSTGT_VC_STS_FIXOUT,							// 測位音出力中状態
-	GPSTGT_VC_STS_OUTOK,							// 出力許可状態
-};
-
 typedef enum{
 	MYREG_RET_REGNG = 0,							// 登録できなかった
 	MYREG_RET_REGOK_PTFULL,							// 登録できたがマップがフル
@@ -186,9 +174,6 @@ typedef enum{
 	EM_TGT_DATA_MAKER = 0,
 	EM_TGT_DATA_CUSTOM,
 	EM_TGT_DATA_DYNAMIC,
-#if __FREE_DATA_DOWNLOAD__
-	EM_TGT_DATA_PAY,		//有料版
-#endif
 }EM_TGT_DATA_TYPE;
 //--------------------------------------------------------------------------
 //  内部型定義                                                              
@@ -265,41 +250,6 @@ typedef struct{
 	U1	u1_areaScSnd;								// エリア無線音記憶
 }ST_OLDMAP;
 
-#define		__ENABLE_DATA_CACHE__
-
-#ifdef		__ENABLE_DATA_CACHE__
-//#define	__CACHE_DEBUG__
-#define	u2_DATA_CACHE_SIZE	256
-typedef struct{
-	U1	u1_cache[u2_DATA_CACHE_SIZE];
-	U1	u1_valid;
-	U4	u4_topAddr;
-	U4	u4_endAddr;
-}ST_DATA_CACHE;
-#endif
-
-typedef enum{
-	HOKAN_MARK_INVALID = 0,
-	HOKAN_MARK_VALID_NOPRI,
-	HOKAN_MARK_VALID_PRI,
-}EM_HOKAN_MARK;
-
-// 補完ターゲット
-typedef struct{
-	U4	u4_data_address;		// データアドレス
-	EM_HOKAN_MARK	mark;		// マーク
-	U2	u2_deg;					// 方向
-	U2	u2_dst;					// 距離
-	U2	u2_lmtspd;				// 制限速度
-	U1	u1_yudo_number;			// 誘導番号
-}ST_HOKAN_TARGET;
-
-#if __I2C_NCYC_SEPARATE__ == 1
-	#define SEM_I2C_GPSCTL SEM_I2C_2
-#else
-	#define SEM_I2C_GPSCTL SEM_I2C
-#endif
-
 //--------------------------------------------------------------------------
 //  変数定義
 //--------------------------------------------------------------------------
@@ -315,43 +265,14 @@ static U1			u1s_poiSetSel;					// POI設定セレクト
 F1					f1g_gpsdat_flg;
 
 static F4			f4s_gpsctl_flg;					// フラグ(警報フェーズ開始時初期化)
-#define	F_RORBIS_CAN	(f4s_gpsctl_flg.bit.bit00)	// 反対車線オービスキャンセルフラグ
-#define	F_RORBIS_NOCAN	(f4s_gpsctl_flg.bit.bit01)	// 反対車線オービスキャンセル否定フラグ
-#define	F_MYAREA_IN		(f4s_gpsctl_flg.bit.bit02)	// マイエリア圏内フラグ
-#define	F_MYCANCEL_IN	(f4s_gpsctl_flg.bit.bit03)	// マイキャンセル圏内フラグ
-#define	F_ATCANCEL_IN	(f4s_gpsctl_flg.bit.bit04)	// オートキャンセル圏内フラグ
-#define	F_CANCEL_NG		(f4s_gpsctl_flg.bit.bit05)	// キャンセルNGフラグ
-#define	F_RDAREA_IN		(f4s_gpsctl_flg.bit.bit06)	// レーダーエリア内フラグ
 #define	F_TRAPZONE_IN	(f4s_gpsctl_flg.bit.bit07)	// トラップゾーン圏内フラグ
 #define	F_PCHK_SZ_IN	(f4s_gpsctl_flg.bit.bit08)	// 駐禁監視最重点エリアフラグ
 #define	F_PCHK_Z_IN		(f4s_gpsctl_flg.bit.bit09)	// 駐禁監視重点エリアフラグ
-#define	F_SCP_H_PASS	(f4s_gpsctl_flg.bit.bit10)	// 道路判別H通過フラグ
-#define	F_SCP_N_PASS	(f4s_gpsctl_flg.bit.bit11)	// 道路判別N通過フラグ
-#define	F_SCP_HCHK_PASS	(f4s_gpsctl_flg.bit.bit12)	// 道路判別H判定通過フラグ
-#define	F_SCP_NCHK_PASS	(f4s_gpsctl_flg.bit.bit13)	// 道路判別N判定通過フラグ
-#define	F_SCP_HCHK_NEAR_PASS	\
-						(f4s_gpsctl_flg.bit.bit14)	// 道路判別H判定近接通過フラグ
-#define	F_SCP_ANYPASS	(f4s_gpsctl_flg.bit.bit15)	// SCP通過フラグ
-#define	F_ATCANCEL_NEAR	(f4s_gpsctl_flg.bit.bit16)	// オートキャンセル近接フラグ
-#define	F_ETC_START		(f4s_gpsctl_flg.bit.bit17)	// ETCゲート案内STARTフラグ
-#define	F_ETC_STOP		(f4s_gpsctl_flg.bit.bit18)	// ETCゲート案内STOPフラグ
-#define	F_SHAJYO_IN		(f4s_gpsctl_flg.bit.bit19)	// 車上狙いエリアフラグ
-#define	F_RDSCOPE_IN	(f4s_gpsctl_flg.bit.bit20)	// レーダースコープフラグ
 #define	F_CHKPNT_IN		(f4s_gpsctl_flg.bit.bit21)	// チェックポイントゾーン圏内フラグ
 #define F_ZONE30_IN		(f4s_gpsctl_flg.bit.bit22)	// ゾーン30エリア圏内フラグ
 
 static F1			f1s_gpsctl_flg2;				// フラグ(フェーズ開始時保存)
-#define	F_STS_ATCANCEL	(f1s_gpsctl_flg2.bit.b0)	// 自動キャンセル内部状態
-#define	F_STS_MYCANCEL	(f1s_gpsctl_flg2.bit.b1)	// マイキャンセル内部状態
 #define	F_MAPUPD		(f1s_gpsctl_flg2.bit.b2)	// マップ更新通知
-#define	F_ATCANCEL_DEL	(f1s_gpsctl_flg2.bit.b3)	// オートキャンセル削除要求フラグ
-#define	F_MYCANCEL_DEL	(f1s_gpsctl_flg2.bit.b4)	// マイキャンセル削除要求フラグ
-#define	F_MYAREA_DEL	(f1s_gpsctl_flg2.bit.b5)	// マイエリア削除要求フラグ
-#define	F_ROADJDG_NOFIX	(f1s_gpsctl_flg2.bit.b6)
-#define	F_PRIPLAYSND	(f1s_gpsctl_flg2.bit.b7)	// 優先サウンド再生フラグ
-
-static F1			f1s_gpsctl_flg3;				// フラグ(電源ON中保存)
-#define	F_REQ_DEFRAG	(f1s_gpsctl_flg3.bit.b0)	// デフラグ要求記憶
 
 static F1			f1s_gpsctl_flg4;
 #define	F_TRAP_INCOMING	(f1s_gpsctl_flg4.bit.b0)	// 取締圏内間近
@@ -369,17 +290,9 @@ static U2			u2s_chkmap_num;					// 判定マップ要素数
 static U2			u2s_oldmap_num;
 static U1			u1s_parkChkAreaSts;				// 駐禁監視エリア状態
 static U1			u1s_zone30AreaSts;				// ゾーン30エリア状態
-static U1			u1s_shajyoAreaSts;				// 車上狙いエリア状態
 static U1			u1s_roadJdgSts;					// 道路判定状態
-static U1			u1s_carStopTmr;					// 停車タイマ
-static U1			u1s_carNosokuiTmr;				// 走行・停車非測位タイマ
 static U1			u1s_curLmtSpd;					// 現在の制限速度値
 static U1			u1s_memLmtSpd;					// 制限速度告知記憶値
-static U1			u1s_relaxSetOld;				// リラックスチャイム設定前回値
-static U1			u1s_myswEvtTmr;					// マイSWイベントタイマ
-static U1			u1s_dynamicTargetFace;			// 動的ターゲット面
-static U1			ems_atCancelRegSts;				// オートキャンセル登録状態(EM_ATCANCEL_REGSTS)
-static U1			u1s_wrt_wrk;					// 書き込みワーク
 static U2			u2s_inisrch_pos;				// 初期サーチポイント
 static U2			u2s_lonarea_old;				// 経度エリア前回値
 static U2			u2s_srch_pos;					// サーチしているポイント
@@ -388,19 +301,9 @@ static U2			u2s_low_pos;					// サーチ下端
 static U2			u2s_srch_box;					// サーチ中BOX
 static U2			u2s_srch_center_grp;			// サーチ中央グループ
 static U2			u2s_srch_inbox_pos;				// サーチBOX内位置
-static U2			u2s_rdNoRxTmr;					// RD非受信タイマ
-static U2			u2s_scpPassTmr;					// SCP通過タイマ
-static U2			u2s_myswTimOut;					// マイSWタイムアウト
-static U2			u2s_carRunTmr;					// 走行タイマ
-static U2			u2s_dynamicBoxUsedNum;			// 使用済みBOX数
 
 // エリア関連
 static U1			u1s_runStopSts;
-
-// ETC関連
-static U1			u1s_ETC_guide_sts;
-static U2			u2s_ETC_guide_tmr;
-static ST_GPSMAP	sts_ETC_guide_point;
 
 // オービス・TRAP・N関連
 ST_GPSMAP			sts_gpsmap[GPSMAP_MAX];			// GPSマップ
@@ -431,34 +334,7 @@ static ST_INDEX1	sts_index1[3];					// 周辺INDEX1情報
 static ST_INDEX1	sts_index1_dynamic[3];			// 周辺INDEX1情報(動的)
 static ST_INDEX1	sts_index1_custom[3];			// 周辺INDEX1情報(カスタム)
 static ST_INDEX1 	*psts_index1;					// INDEX1ポインタ
-#if __FREE_DATA_DOWNLOAD__
-static ST_INDEX1	sts_index1_pay[3];				// 周辺INDEX1情報(有料版)
-#endif
 static U4			u4s_srch_address;
-
-static U4			u4s_relaxTmr;					// リラックスチャイムタイマ
-
-// SW関連
-U2					u2g_failTmr;					// フェールタイマ
-
-// キュー関連
-static ST_GPSVC_QUEUE	sts_gpsVcHiPriQueue[VC_HIPRI_QUEUE_MAX];
-													// 高優先ボイスキュー
-static ST_GPSVC_QUEUE	sts_gpsVcMidPriQueue[VC_MIDPRI_QUEUE_MAX];
-													// 中優先ボイスキュー
-static ST_GPSVC_QUEUE	sts_gpsVcLoPriQueue[VC_LOPRI_QUEUE_MAX];
-													// 低優先ボイスキュー
-
-static ST_GPSVC_QUEUE_CTRL	sts_gpsVcQueueCtrl[3];
-
-// キャッシュ
-#ifdef __ENABLE_DATA_CACHE__
-static ST_DATA_CACHE	sts_dataCache;
-#ifdef __CACHE_DEBUG__
-static U2			u2s_cacheHitNum;
-static U2			u2s_cacheMissHitNum;
-#endif
-#endif
 
 // GPS警報レベル
 static U1			u1s_gpsWarningLvl_wrk;			// ワーク
@@ -470,18 +346,12 @@ static U1			u1s_gpsRdScopeTmr;
 // 日付比較用
 static UN_REGDAY	uns_today;
 
-static Bool			g_InMyArea;						// マイエリア内か
-static Bool			g_InMyCancelArea;				// マイキャンセルエリア内か
-
 static U2	s_SrcRefIdxList[GPS_VISIBLE_TGT_MAX];	// 可視インデックスリスト
 static U2	srcRefIdxListSize;						// 可視インデックスリスト数
 
 static U2	u2s_gpsHoldTmr;							// GPS保持タイマ
 
-static U1	u1s_max_rxperc_for_icancel;
-
 static U1	u1s_gpsTgtVcSts;
-static U1	u1s_kenkyo_mem;
 
 ST_GPSVC_QUEUE		sts_lastRequested_queue;
 
@@ -490,13 +360,6 @@ static S4	gps_distToHighway;
 static float k_lon2_meter;
 
 static U4	u4s_live_counter;
-
-static ST_GPSMAP *psts_rd_bp2_pri_map;				// RD最優先
-static ST_GPSMAP *psts_sc_bp2_pri_map;				// SC最優先
-
-static Bool is_orbisCountDown;
-
-static U2 u2s_vcsts_failsafe_tmr;
 
 ST_SET_GPS				stg_setGps[SET_ACS_MAX];		// GPS設定値
 ST_SET_MISC				stg_setMisc;					// その他設定値
@@ -508,12 +371,10 @@ static U2	u2g_dataSpec;
 //--------------------------------------------------------------------------
 //  内部関数プロトタイプ宣言												
 //--------------------------------------------------------------------------
-static void	PhaseChkMov(void);						// 移動判定フェーズ処理
+static Bool	PhaseChkMov(void);						// 移動判定フェーズ処理
 static void	PhaseMakeMap(void);						// MAP生成フェーズ処理
 static void	PhaseChgMap(void);						// MAP変更判定フェーズ処理
 static void	PhaseChkWrn(void);						// 警報判定フェーズ処理
-
-static void CustomDataChk(void);					// カスタムデータチェック
 
 static U1	u1_ChkGpsMapUpd(void);					// MAP更新判定処理
 static void	UpdLatLonArea(void);					// 緯度・経度範囲更新処理
@@ -523,7 +384,6 @@ static U1	u1_PntSrch(U1, EM_TGT_DATA_TYPE);		// ポイントサーチ
 static U1	u1_ReadGpsData(U4, EM_TGT_DATA_TYPE);	// GPSデータ読み出し処理
 static U1	u1_RegMap(void);						// MAP登録処理
 static Bool Can_data_pre_expire(ST_GPSROM *);		// 事前データ棄却判定処理
-static void	RomEnScrmble(U1, U4, U1 *);				// スクランブル処理
 static U4	u4_RomDeScrmble(ST_GPSROM *p_rom, U1 u1h_type);	// スクランブル解除処理
 static	U2	Shahen(U2, U2);							// 斜辺算出処理
 static U2	u2_CalDstAxis(U4, U1);					// 軸方向距離算出処理
@@ -554,7 +414,6 @@ static void TransitZone30Sts(void);					// ゾーン30状態遷移
 static void	TransitShajyoSts(void);					// 車上狙い状態遷移
 static void	TransitETCGuide(void);					// ETCガイド管理
 static void	RoadJudge(void);						// 道路判定処理
-static U1	u1_TransitRoadJudge(void);
 static U1	u1_ChkDegRng(EM_TGTDEG, U2);			// 角度範囲判定処理
 static U1	u1_DegAIsOk(ST_GPSMAP *);				// ∠A範囲判定処理
 static U1	u1_DegAIsOk_Variable(ST_GPSMAP *psth_map, U1 u1h_deg);
@@ -586,12 +445,9 @@ static void	ChkFocusTgt_2nd(ST_FOCUS_TGT *psth_2nd_focus_tgt, ST_GPSMAP *psth_ma
 
 static void initFocusTgt(ST_FOCUS_TGT *psth_tgt);
 
-static void ChkRevOrbisArea(ST_GPSMAP *);			// 反対車線オービス判定処理
 static U1	IsJudgePOISet(U1);						// POI設定判定処理
 static U1	u1_JudgePOISet(ST_GPSMAP *);			// 
 static U1	u1_JudgePOISetTunnel(ST_GPSMAP *);		// 
-
-static void	RoadJdgRoutine(void);					// 道路判定定期処理
 
 static void	AddVisibleIdxLst(U2);					// 可視インデックスリスト追加処理
 static void	SortVisibleIdxLst(U2);					// 可視インデックスリストソート処理
@@ -599,21 +455,12 @@ static void	SortVisibleIdxLst_2nd(U2 u2h_secondIdx);
 
 static void sortSrcRefIdxByDistance(void);			// インデックスリストソート距離ソート処理
 
-//static void	CalTunnelInRemDist(void);				// トンネル内残距離算出処理
 static void	ChkZoneGpsWrnLvl(U1);					// ゾーンGPS警報レベル判定処理
-
-static void	GuardPictNumber(ST_GPSMAP *);
-static Bool	UpdateSoundTarget(U2 *pu2h_sndTgtNum, U4 *pu4h_orgAddress, const ST_GPSMAP *psth_map, U2 u2h_mapNum); 
 
 static void update_gps_warning_lvl(EM_SYS_WARNING_LVL src_lvl, U2 dist);
 
 static void update_ahead_hys(ST_GPSMAP *psth_map);
 static void update_distance(ST_GPSMAP *psth_map);
-
-static void TransitAreaStatusForRd(ST_GPSMAP *psth_map);
-static void TransitAreaStatusForSc(ST_GPSMAP *psth_map, U1 degChk);
-
-static Bool isCustomDateValid(ST_HEADER *header);
 
 S2	s2_CalDegSub(U2 u2h_deg1, U2 u2h_deg2);
 
@@ -794,14 +641,6 @@ static const U1	u1_TBL_CONV_ZONE30STS[] = {
 	ZONE30_AREA_IN,
 };
 
-// キューデフォルト値
-static const ST_GPSVC_QUEUE_CTRL	st_TBL_gpsVcQueueDef[] = {
-
-	{	&sts_gpsVcHiPriQueue[0],	VC_HIPRI_QUEUE_MAX,		VC_QUEUE_EMPTY,		0,		0,		},
-	{	&sts_gpsVcMidPriQueue[0],	VC_MIDPRI_QUEUE_MAX,	VC_QUEUE_EMPTY,		0,		0,		},
-	{	&sts_gpsVcLoPriQueue[0],	VC_LOPRI_QUEUE_MAX,		VC_QUEUE_EMPTY,		0,		0,		},
-};
-
 //--------------------------------------------------------------------------
 //  外部関数定義															
 //--------------------------------------------------------------------------
@@ -814,40 +653,47 @@ void PoiSample(const char* fname, U2 dataSpec){
 	sts_gpsinf.lon = 8220672;
 	u2s_lonarea_old = U2_MAX;						// 前回経度エリア範囲外に
 
-	PhaseChkMov();
-	PhaseMakeMap();
-	PhaseChgMap();
+	if(PhaseChkMov() == TRUE){
+		PhaseMakeMap();
+		PhaseChgMap();
+		PhaseChkWrn();
+	}
 }
 
 //--------------------------------------------------------------------------
 //【関数】移動判定フェーズ													
 //【機能】自車移動距離を計測して、移動していればINDEX1を更新する			
 //--------------------------------------------------------------------------
-static void PhaseChkMov(void){
+static Bool PhaseChkMov(void){
 
 	ST_GPSMAP	*pstt_oldmap;
 	ST_GPSMAP	*pstt_curmap;
 
 	UpdLatLonArea();								// 緯度・経度範囲の決定
 
-	UpdIndex1();								// INDEX1更新
-	// マップ作成前に旧データの退避
-	pstt_oldmap = &sts_oldmap[0];
-	pstt_curmap = &sts_gpsmap[0];
+	if(u1_ChkGpsMapUpd() == TRUE){					// MAP更新要ならば
+		UpdIndex1();								// INDEX1更新
+		// マップ作成前に旧データの退避
+		pstt_oldmap = &sts_oldmap[0];
+		pstt_curmap = &sts_gpsmap[0];
 
-	u2s_oldmap_num = u2s_chkmap_num;
-	if(u2s_oldmap_num != 0){
-		memcpy(pstt_oldmap, pstt_curmap, sizeof(ST_GPSMAP)*u2s_oldmap_num);
+		u2s_oldmap_num = u2s_chkmap_num;
+		if(u2s_oldmap_num != 0){
+			memcpy(pstt_oldmap, pstt_curmap, sizeof(ST_GPSMAP)*u2s_oldmap_num);
+		}
+		// 緯度・経度の許容範囲パラメータ決定
+		u4s_latDiffPrmMinus = sts_gpsinf.lat - u4_TBL_LATDIST[DISTRNG_2500M][sts_gpsinf.u1_latarea];
+		u4s_latDiffPrmPlus = sts_gpsinf.lat + u4_TBL_LATDIST[DISTRNG_2500M][sts_gpsinf.u1_latarea];
+		u4s_lonDiffPrmMinus = sts_gpsinf.lon - u4_TBL_LONDIST[DISTRNG_2500M][sts_gpsinf.u1_latarea];
+		u4s_lonDiffPrmPlus = sts_gpsinf.lon + u4_TBL_LONDIST[DISTRNG_2500M][sts_gpsinf.u1_latarea];
+
+		u2s_mkmap_hiPri_num = VIRTUAL_INDEX_TYPES;	// 高優先マップ作成数初期化(仮想ターゲット分は確保)
+		u2s_mkmap_loPri_num = 0;					// 低優先マップ作成数初期化
+		u2s_mkmap_num = VIRTUAL_INDEX_TYPES;		// 作成MAP要素数クリア(仮想ターゲット分は確保)
+
+		return TRUE;
 	}
-	// 緯度・経度の許容範囲パラメータ決定
-	u4s_latDiffPrmMinus = sts_gpsinf.lat - u4_TBL_LATDIST[DISTRNG_2500M][sts_gpsinf.u1_latarea];
-	u4s_latDiffPrmPlus = sts_gpsinf.lat + u4_TBL_LATDIST[DISTRNG_2500M][sts_gpsinf.u1_latarea];
-	u4s_lonDiffPrmMinus = sts_gpsinf.lon - u4_TBL_LONDIST[DISTRNG_2500M][sts_gpsinf.u1_latarea];
-	u4s_lonDiffPrmPlus = sts_gpsinf.lon + u4_TBL_LONDIST[DISTRNG_2500M][sts_gpsinf.u1_latarea];
-
-	u2s_mkmap_hiPri_num = VIRTUAL_INDEX_TYPES;	// 高優先マップ作成数初期化(仮想ターゲット分は確保)
-	u2s_mkmap_loPri_num = 0;					// 低優先マップ作成数初期化
-	u2s_mkmap_num = VIRTUAL_INDEX_TYPES;		// 作成MAP要素数クリア(仮想ターゲット分は確保)
+	return FALSE;
 }
 
 //--------------------------------------------------------------------------
@@ -1053,9 +899,6 @@ static void PhaseChkWrn(void){
 	// 可視インデックスリスト初期化
 	srcRefIdxListSize = 0;
 
-	// オービスカウントダウン初期化
-	is_orbisCountDown = FALSE;
-
 	if(u2s_chkmap_num > VIRTUAL_INDEX_TYPES){		// マップポイントありなら
 		for(u2s_sub_phase = VIRTUAL_INDEX_TYPES; u2s_sub_phase < u2s_chkmap_num ; u2s_sub_phase++){
 			// 自車<->ターゲット間距離の更新
@@ -1153,23 +996,17 @@ static U1	u1_ChkGpsMapUpd(void){
 	U4	u4t_londiff;								// 経度差分
 	U1	u1t_judge = FALSE;
 
-	if(0){//vpol_flg1(EVTFLG_REQ_MAPUPD, TWF_CLR) == E_OK){
+	// 最終マップ更新位置からの距離を測定
+	// 緯度成分絶対値差分
+	u4t_latdiff = ABS_SUB(sts_gpsinf.lat, u4s_mapupd_lat);
+
+	// 経度成分絶対値差分
+	u4t_londiff = ABS_SUB(sts_gpsinf.lon, u4s_mapupd_lon);
+
+	// 移動量が規定距離を越えている or 更新要求発生 ならマップを更新させる
+	if((u4t_latdiff >= u4_TBL_LATDIST[DISTRNG_200M][sts_gpsinf.u1_latarea])
+	|| (u4t_londiff >= u4_TBL_LONDIST[DISTRNG_200M][sts_gpsinf.u1_latarea])){
 		u1t_judge = TRUE;
-		u2s_lonarea_old = U2_MAX;					// INDEX強制更新
-	}
-	else{
-		// 最終マップ更新位置からの距離を測定
-		// 緯度成分絶対値差分
-		u4t_latdiff = ABS_SUB(sts_gpsinf.lat, u4s_mapupd_lat);
-
-		// 経度成分絶対値差分
-		u4t_londiff = ABS_SUB(sts_gpsinf.lon, u4s_mapupd_lon);
-
-		// 移動量が規定距離を越えている or 更新要求発生 ならマップを更新させる
-		if((u4t_latdiff >= u4_TBL_LATDIST[DISTRNG_200M][sts_gpsinf.u1_latarea])
-		|| (u4t_londiff >= u4_TBL_LONDIST[DISTRNG_200M][sts_gpsinf.u1_latarea])){
-			u1t_judge = TRUE;
-		}
 	}
 
 	if(u1t_judge){
@@ -1522,26 +1359,6 @@ static Bool	Can_data_pre_expire(ST_GPSROM *psth_gpsrom){
 }
 
 //--------------------------------------------------------------------------
-//【関数】GPS緯度・経度情報スクランブル処理									
-//【機能】オフセット値に変換して格納する									
-//【備考】																	
-//--------------------------------------------------------------------------
-static void	RomEnScrmble(U1 u1h_type, U4 u4h_input, U1 *pu1h_output){
-
-	if(u1h_type == TYPE_LAT){						// 緯度
-		u4h_input -= u4_LAT_BASE_MIN;
-	}
-	else{											// 経度
-		u4h_input -= u4_LON_BASE_MIN;
-	}
-
-	// 1→2→3の順で格納
-	pu1h_output[0] = (U1)(u4h_input & (U4)0x000000FF);
-	pu1h_output[1] = (U1)((u4h_input & (U4)0x0000FF00) >> 8);
-	pu1h_output[2] = (U1)((u4h_input & (U4)0x00FF0000) >> 16);
-}
-
-//--------------------------------------------------------------------------
 //【関数】GPS緯度・経度情報スクランブル解除処理								
 //【機能】情報を使用できる数値に変換する									
 //【引数】対象タイプ  TYPE_LAT：緯度  TYPE_LON：経度						
@@ -1835,12 +1652,9 @@ static void	TransitOrbis(EM_TGTDEG emh_tgtDeg){
 																	// 通過角度OK
 					&& (psts_chkmap->un_type.bit.b_tunnel == OFF)	// トンネル以外
 					&& (stg_setGps[u1g_setAcsSel].b_orbisPass)){	// オービス通過告知ONなら
-						if(u1s_gpsTgtVcSts == GPSTGT_VC_STS_OUTOK){
-							VcReq(VC_ORBIS_PASS);					// 通過告知
-							F_PRIPLAYSND = TRUE;
-							u2s_sndTgtNum = u2s_sub_phase;
-							u4s_sndTgtAddress = psts_chkmap->u4_dataAddr;
-						}
+						VcReq(VC_ORBIS_PASS);					// 通過告知
+						u2s_sndTgtNum = u2s_sub_phase;
+						u4s_sndTgtAddress = psts_chkmap->u4_dataAddr;
 					}
 				}
 				else if((psts_chkmap->u2_dst <= u2_DIST_330M) && (u1t_degChk == OK)){
@@ -1862,12 +1676,9 @@ static void	TransitOrbis(EM_TGTDEG emh_tgtDeg){
 																	// 通過角度OK
 					&& (psts_chkmap->un_type.bit.b_tunnel == OFF)	// トンネル以外
 					&& (stg_setGps[u1g_setAcsSel].b_orbisPass)){	// オービス通過告知ONなら
-						if(u1s_gpsTgtVcSts == GPSTGT_VC_STS_OUTOK){
-							VcReq(VC_ORBIS_PASS);				// 通過告知
-							F_PRIPLAYSND = TRUE;
-							u2s_sndTgtNum = u2s_sub_phase;
-							u4s_sndTgtAddress = psts_chkmap->u4_dataAddr;
-						}
+						VcReq(VC_ORBIS_PASS);				// 通過告知
+						u2s_sndTgtNum = u2s_sub_phase;
+						u4s_sndTgtAddress = psts_chkmap->u4_dataAddr;
 					}
 				}
 				break;
@@ -1913,63 +1724,6 @@ static void	TransitOrbis(EM_TGTDEG emh_tgtDeg){
 	}
 }
 
-//--------------------------------------------------------------------------
-//【関数】反対車線オービスキャンセルエリア判定処理							
-//【機能】反対車線オービスキャンセルエリア成立・否定を判定する				
-//【引数】psth_map：判定するマップポイントへのポインタ						
-//【戻値】なし																
-//【備考】																	
-//--------------------------------------------------------------------------
-static void	ChkRevOrbisArea(ST_GPSMAP *psth_map){
-
-	S2	s2t_degDiff;										// 角度差
-
-	// ターゲット角度と自車方位角との差を算出
-	s2t_degDiff = s2_CalDegSub(psth_map->u2_tgtDeg, sts_gpsinf.u2_deg);
-	if(s2t_degDiff < 0){
-		s2t_degDiff *= (S2)-1;								// 絶対値にする
-	}
-	if(s2t_degDiff <= 90*DEG_LSB){							// 90°以内(対向していない側)
-		if((psth_map->u2_dst <= u2_DIST_600M)				// ターゲット中心から600m以内 or
-		|| ((psth_map->u2_dst <= u2_DIST_1100M) && (u1_DegAIsOk(psth_map) == TRUE))){
-															// ターゲット方位の1100m扇範囲内にいる ?
-			F_RORBIS_CAN = ON;								// キャンセルフラグセット
-		}
-	}
-	else{													// 90°より大(対向している側)
-		if((psth_map->u2_dst <= u2_DIST_1100M) && (u1_DegAIsOk(psth_map) == TRUE)){
-															// ターゲット中心から1100m以内 ?
-			F_RORBIS_NOCAN = ON;							// キャンセル否定フラグセット
-		}
-	}
-}
-#if 0
-//--------------------------------------------------------------------------//
-//【関数】トンネル内残距離算出処理											//
-//【機能】トンネル内属性データの残距離を算出する							//
-//【引数】なし																//
-//【戻値】なし																//
-//【備考】毎秒のGPS位置データが更新されるごとに、入力(u2_dst)は仮想点からの	//
-//        距離が入っている。												//
-//        可視ターゲットの距離ソート終了後しか行ってはいけない				//
-//--------------------------------------------------------------------------//
-static void	CalTunnelInRemDist(void){
-
-	int	i;
-	ST_GPSMAP	*pstt_map;
-
-	// 可視ターゲットの中から対象があるか検索し、あったら計算する。
-	if(srcRefIdxListSize != 0){
-		for(i=0 ; i<srcRefIdxListSize ; i++){
-			pstt_map = &sts_gpsmap[s_SrcRefIdxList[i]];
-			if(pstt_map->un_type.bit.b_tunnel == TUNNEL_IN){
-													// トンネル内属性
-				pstt_map->u2_dst = GRDADDU2(pstt_map->u2_dst, ((U2)pstt_map->un_extra.common.u1_tunnelRem*(U2)100));
-			}
-		}
-	}
-}
-#endif
 //--------------------------------------------------------------------------
 //【関数】ゾーン警報遷移処理												
 //【機能】ゾーン警報を判定する												
@@ -2108,10 +1862,6 @@ static void	TransitZone(EM_TGTDEG emh_tgtDeg){
 																// 一時停止以外のとき
 			if(psts_chkmap->un_extra.trapchk.u1_method != METHOD_SIGNAL){
 																// さらに交差点以外のとき
-				// キャンセルNG判定
-			 	if(psts_chkmap->u2_dst <= u2_DIST_600M){
-					F_CANCEL_NG = ON;							// キャンセルNG成立
-				}
 				// RD感度上昇用判定
 				if(psts_chkmap->u1_wrnSts == STS_ZONE_500M){	// 半径500m圏内 ?
 					F_TRAPZONE_IN = ON;
@@ -2138,10 +1888,6 @@ static void	TransitZone(EM_TGTDEG emh_tgtDeg){
 			F_CHKPNT_INCOMING = ON;
 		}
 	}
-
-	// エリア状態遷移
-	TransitAreaStatusForRd(psts_chkmap);
-	TransitAreaStatusForSc(psts_chkmap, u1t_degChk);
 
 	ChkZoneGpsWrnLvl(u1t_degChk);								// ゾーンGPS警報レベル判定
 }
@@ -2202,15 +1948,6 @@ static void TransitMyArea(EM_TGTDEG emh_tgtDeg){
 //【戻値】なし																
 //--------------------------------------------------------------------------
 static void TransitPin(EM_TGTDEG emh_tgtDeg){
-
-	U1	u1t_degChk = u1_ChkDegRng(emh_tgtDeg, psts_chkmap->u2_dst);
-
-	// ピンのフォーカスターゲット判定
-	ChkFocusTgt(&sts_focusTgt, psts_chkmap, u2_DIST_1100M, u2_DIST_1100M, u1t_degChk, FALSE);
-	ChkFocusTgt(&sts_warning_focusTgt_Primary, psts_chkmap, u2_DIST_1100M, u2_DIST_1100M, u1t_degChk, FALSE);
-
-	// インデックスリスト追加
-	AddVisibleIdxLst(u2s_sub_phase);
 }
 
 //--------------------------------------------------------------------------
@@ -2368,34 +2105,6 @@ static void	TransitContOneShotType(EM_TGTDEG emh_tgtDeg){
 		u1t_visible = FALSE;					// 見えない
 		u1t_vcGps = VCGPS_300MCONT;
 		break;
-	// 100mグループ
-	case TGT_KENKYO:							// 県境
-		u2t_inDst = u2_DIST_100M;
-		u2t_outDst = u2_DIST_600M;
-		u1t_reqFocus = FALSE;					// フォーカス不要
-		u1t_visible = FALSE;					// 見えない
-		u1t_vcGps = VCGPS_100MCONT;
-		break;
-
-	case TGT_PARKING:							// 駐車場
-	case TGT_RAILROAD_CROSSING:					// 踏切
-	case TGT_TOILET:							// 公衆トイレ
-	case TGT_FIRE:								// 消防署
-	case TGT_HOIKU:								// 保育園
-		u2t_inDst = u2_DIST_100M;
-		u2t_outDst = u2_DIST_600M;
-		u1t_reqFocus = FALSE;					// フォーカス不要
-		u1t_vcGps = VCGPS_NONE;					// 音声不要
-		break;
-
-	case TGT_TMPSTOP:							// 一時停止注意ポイント
-		u2t_inDst = u2_DIST_100M;
-		u2t_outDst = u2_DIST_600M;
-		u1t_reqFocus = FALSE;					// フォーカス不要
-		u1t_vcGps = VCGPS_NONE;					// 音声不要
-		// 角度判定結果を可視判定結果にする
-		u1t_visible = u1t_degChk;
-		break;
 
 	case TGT_HWRADIO:							// ハイウェイラジオ
 		u2t_inDst = u2_DIST_100M;
@@ -2530,9 +2239,6 @@ static void	TransitContAreaType(EM_TGTDEG emh_tgtDeg){
 		}
 		else if(psts_chkmap->un_type.bit.b_code == TGT_PARKCHK_AREA_Z){
 			F_PCHK_Z_IN = ON;								// 重点ありで上書き
-		}
-		else{												// 車上狙い
-			F_SHAJYO_IN = ON;
 		}
 	}
 
@@ -2819,10 +2525,6 @@ static void TransitTunnelZone(EM_TGTDEG emh_tgtDeg){
 																	// 一時停止以外のとき
 				if(psts_chkmap->un_extra.trapchk.u1_method != METHOD_SIGNAL){
 																	// さらに交差点以外のとき
-					// キャンセルNG判定
-				 	if(psts_chkmap->u2_dst <= u2_DIST_600M){
-						F_CANCEL_NG = ON;							// キャンセルNG成立
-					}
 					// RD感度上昇用判定
 					if(psts_chkmap->u1_wrnSts == STS_ZONE_500M){	// 半径500m圏内 ?
 						F_TRAPZONE_IN = ON;
@@ -2853,10 +2555,6 @@ static void TransitTunnelZone(EM_TGTDEG emh_tgtDeg){
 		ChkZoneGpsWrnLvl(u1t_degChk);								// ゾーンGPS警報レベル判定
 
 	}
-	// エリア状態遷移
-	TransitAreaStatusForRd(psts_chkmap);
-	TransitAreaStatusForSc(psts_chkmap, u1t_degChk);
-
 }
 //--------------------------------------------------------------------------
 //【関数】誘導遷移処理														
@@ -2880,107 +2578,6 @@ static void TransitSyudo(EM_TGTDEG emh_tgtDeg)
 }
 
 //--------------------------------------------------------------------------
-//【関数】走行判定定期処理													
-//【機能】																	
-//【引数】なし																
-//【戻値】なし																
-//【備考】																	
-//--------------------------------------------------------------------------
-static void RoadJdgRoutine(void){
-
-	U2		u2t_lmtSpd;
-
-	// 非測位タイマの計測
-	if(sts_gpsinf.b_spddeg_ok != OK){				// 速度無効なら
-		INCCNTU1(u1s_carNosokuiTmr);			// 連続非測位時間計測
-		// 走行タイマの無効化判定
-		if(u1s_carNosokuiTmr >= u1_RUN_NOSOKUI_TIM){
-												// 一定時間非測位継続
-			u2s_carRunTmr = 0;					// 走行タイマ計測やり直し
-			if(u1s_roadJdgSts == ROADJDG_STS_CHKHIGH){
-				F_ROADJDG_NOFIX = ON;			// 非測位検出を通知
-			}
-		}
-#if 0
-		// 停車タイマの無効化判定
-		if(u1s_carNosokuiTmr >= u1_STOP_NOSOKUI_TIM){
-			u1s_carStopTmr = 0;
-		}
-#endif
-	}
-	else{										// 速度有効
-		u1s_carNosokuiTmr = 0;					// 非測位タイマをクリア
-	}
-
-	if(sts_gpsinf.b_spddeg_ok == OK){				// 速度有効なら
-		// 走行タイマの計測
-		if((u1s_roadJdgSts == ROADJDG_STS_CHKHIGH)
-		&& (u1s_curLmtSpd != LMTSPD_NONE)){
-			u2t_lmtSpd = (U2)u1s_curLmtSpd * (U2)10 * SPD_LSB;
-			if(u2t_lmtSpd >= (70*SPD_LSB)){			// 制限速度70mk/h以上
-				if(sts_gpsinf.u2_spd >= u2t_lmtSpd){
-													// 制限速度以上
-					u2s_carRunTmr = GRDADDU2(u2s_carRunTmr, 2);
-													// カウント重み2倍
-				}
-				else if(sts_gpsinf.u2_spd >= (u2t_lmtSpd - (30*SPD_LSB))){
-													// 制限速度-30km/h以上なら
-					INCCNTU2(u2s_carRunTmr);		// カウント重み1倍
-				}
-				else{								// 以下ならホールド
-					;
-				}
-			}
-			else{									// 制限速度60km/h以下
-				if(sts_gpsinf.u2_spd >= u2t_lmtSpd){
-													// 制限速度以上
-					INCCNTU2(u2s_carRunTmr);		// カウント重み1倍
-				}
-				else{								// 以下ならホールド
-					;
-				}
-			}
-		}
-		else{
-			u2s_carRunTmr = 0;
-		}
-		
-		// 停車タイマの計測
-		if((u1s_roadJdgSts == ROADJDG_STS_CHKNORM)
-		&& (u1s_curLmtSpd != LMTSPD_NONE)){
-			if(sts_gpsinf.u2_spd > u2_HIGH2NORM_SPD){
-				u1s_carStopTmr = 0;					// 計測やり直し
-			}
-			else{
-				u2t_lmtSpd = (U2)u1s_curLmtSpd * (U2)10 * SPD_LSB;
-				if(u2t_lmtSpd >= (70*SPD_LSB)){		// 制限速度70mk/h以上
-					u1s_carStopTmr = GRDADDU1(u1s_carStopTmr, 2);
-													// カウント重み2倍
-				}
-				else{
-					INCCNTU1(u1s_carStopTmr);		// カウント重み1倍
-				}
-			}
-		}
-		else{
-			u1s_carStopTmr = 0;
-		}
-	}
-
-	// SCP通過タイマの計測
-	if((u1s_roadJdgSts == ROADJDG_STS_HIGH) || (u1s_roadJdgSts == ROADJDG_STS_CHKHIGH)){
-		if(sts_gpsinf.b_spddeg_ok == OK){
-			INCCNTU2(u2s_scpPassTmr);
-		}
-	}
-	else{
-		u2s_scpPassTmr = 0;
-	}
-
-
-}
-
-//--------------------------------------------------------------------------
 //【関数】道路判定処理														
 //【機能】道路判定状態遷移を行う											
 //【引数】なし																
@@ -2988,184 +2585,6 @@ static void RoadJdgRoutine(void){
 //【備考】																	
 //--------------------------------------------------------------------------
 static void	RoadJudge(void){
-
-	U1	u1t_oldSts = u1s_roadJdgSts;
-	U1	u1t_lmtSpd = (U1)stg_setGps[u1g_setAcsSel].b_hwChgLmtSpd;
-	U1	u1t_roadSel = stg_setMisc.b_roadSel;
-	U1	u1t_outReq = OFF;								// 出力要求なしで初期化
-
-	if(u1t_lmtSpd == OFF){								// 制限速度告知設定OFF
-		u1s_memLmtSpd = LMTSPD_NONE;					// 制限速度記憶なしに初期化
-	}
-
-	if(sts_gpsinf.b_spddeg_ok != OK){
-		return;
-	}
-
-	if(F_SCP_ANYPASS){
-		u2s_scpPassTmr = 0;								// SCP通過タイマクリア
-	}
-
-	if(u1t_roadSel != SET_ROAD_AUTO){					// 道路選択オート以外
-		if((F_SCP_H_PASS)								// 高速確定
-		|| (F_SCP_HCHK_NEAR_PASS)						// or 高速未確定50m
-		|| ((F_SCP_HCHK_PASS) && (sts_gpsinf.u2_spd >= ((U2)sts_scpPoint.un_extra.scp.b_lmtSpd * (U2)10 * SPD_LSB)))){
-														// or (高速未確定100m and 速度以上)
-			u1t_outReq = ON;							// 出力要求ありにする
-		}
-		u1_TransitRoadJudge();
-	}
-	else{
-		u1t_outReq = u1_TransitRoadJudge();
-	}
-
-	// 音声出力要求
-	if((u1t_outReq) && (u1t_lmtSpd)						// 要求有 and 設定ON
-	&& (sts_scpPoint.un_extra.scp.b_lmtSpd != LMTSPD_NONE)
-														// 制限速度なしでない(一応ガード)
-	&& (u1s_memLmtSpd != sts_scpPoint.un_extra.scp.b_lmtSpd)){
-														// and 速度変更
-		sts_gpsmap[SCP_VIRTUAL_INDEX] = sts_scpPoint;
-		sts_gpsmap[SCP_VIRTUAL_INDEX].u4_dataAddr = SCP_VIRTUAL_ADDRESS;
-		GpsVcEnQueue(VC_GPSVAR, VCGPS_SCPCONT, SCP_VIRTUAL_ADDRESS);
-		u1s_memLmtSpd = (U1)(sts_scpPoint.un_extra.scp.b_lmtSpd);
-	}
-
-	// マップ更新要求
-	if(u1t_oldSts != u1s_roadJdgSts){					// 道路判別状態変化なら
-//		vset_flg1(EVTFLG_REQ_MAPUPD);					// マップ更新要求
-	}
-
-	F_ROADJDG_NOFIX = OFF;
-
-}
-
-static U1	u1_TransitRoadJudge(void){
-
-	U1	u1t_outReq = OFF;
-
-		switch(u1s_roadJdgSts){
-//------------------------------------------------------------------------------------------------
-	case ROADJDG_STS_NORM:							// 一般道
-		if(sts_gpsinf.u2_spd > u2_HIGH2NORM_SPD){	// 規定速度より大
-			if(F_SCP_H_PASS){						// 高速確定なら
-				u1s_curLmtSpd = sts_scpPoint.un_extra.scp.b_lmtSpd;
-													// 現在の制限速度値更新
-				u1s_roadJdgSts = ROADJDG_STS_HIGH;	// 高速道へ
-				u1t_outReq = ON;					// 出力要求
-			}
-			else if((F_SCP_HCHK_PASS) || (F_SCP_HCHK_NEAR_PASS)){
-													// 確定ではないが高速通過なら
-				u1s_curLmtSpd = sts_scpPoint.un_extra.scp.b_lmtSpd;
-													// 現在の制限速度値更新
-				u1s_roadJdgSts = ROADJDG_STS_CHKHIGH;
-													// 高速判別中へ
-			}
-		}
-		break;
-//------------------------------------------------------------------------------------------------
-	case ROADJDG_STS_CHKHIGH:						// 高速判別中
-		if(F_SCP_N_PASS){							// 一般確定なら
-			u1s_roadJdgSts = ROADJDG_STS_NORM;		// 一般道へ
-			u1s_memLmtSpd = LMTSPD_NONE;
-			u1s_curLmtSpd = LMTSPD_NONE;
-		}
-		else if(sts_gpsinf.u2_spd <= u2_NORMVALID_SPD){
-													// 極低速検出
-			u1s_roadJdgSts = ROADJDG_STS_NORM;		// 一般道へ
-//				u1s_memLmtSpd = LMTSPD_NONE;
-			u1s_curLmtSpd = LMTSPD_NONE;
-		}
-		else if(sts_gpsinf.u2_spd <= u2_HIGH2NORM_SPD){
-													// 低速検出
-			u1s_roadJdgSts = ROADJDG_STS_CHKNORM;	// 一般道判定中へ
-		}
-		else if(F_ROADJDG_NOFIX){
-			u1s_roadJdgSts = ROADJDG_STS_CHKNORM;	// 一般道判定中へ
-		}
-		else if(u2s_scpPassTmr >= u2_SCP_NOPASS_TIM){
-													// 非通過時間が一定時間経過
-			u1s_roadJdgSts = ROADJDG_STS_CHKNORM;	// 一般道判定中へ
-		}
-		else if(F_SCP_H_PASS){						// 高速確定
-			u1s_roadJdgSts = ROADJDG_STS_HIGH;		// 高速道へ
-			u1s_curLmtSpd = sts_scpPoint.un_extra.scp.b_lmtSpd;
-													// 現在の制限速度値更新
-			u1t_outReq = ON;						// 出力要求
-		}
-		else if((u1s_curLmtSpd >= LMTSPD_70KMH) && (F_SCP_HCHK_PASS)){
-													// 制限70km/h以上 and 確定ではないが高速通過(2回目)
-			u1s_roadJdgSts = ROADJDG_STS_HIGH;		// 高速道へ
-			u1s_curLmtSpd = sts_scpPoint.un_extra.scp.b_lmtSpd;
-													// 現在の制限速度値更新
-			u1t_outReq = ON;						// 出力要求
-		}
-		else if(u2s_carRunTmr >= u2_RUN_CONT_TIM){	// 連続高速走行 ?
-			u1s_roadJdgSts = ROADJDG_STS_HIGH;		// 高速道へ
-			u1t_outReq = ON;						// 出力要求
-		}
-		break;
-//------------------------------------------------------------------------------------------------
-	case ROADJDG_STS_HIGH:							// 高速道
-		if(F_SCP_N_PASS){							// 一般確定なら
-			u1s_roadJdgSts = ROADJDG_STS_NORM;		// 一般道へ
-			u1s_memLmtSpd = LMTSPD_NONE;
-			u1s_curLmtSpd = LMTSPD_NONE;
-		}
-		else if(sts_gpsinf.u2_spd <= u2_NORMVALID_SPD){
-													// 極低速検出
-			u1s_roadJdgSts = ROADJDG_STS_NORM;		// 一般道へ
-//				u1s_memLmtSpd = LMTSPD_NONE;
-			u1s_curLmtSpd = LMTSPD_NONE;
-		}
-		else if(sts_gpsinf.u2_spd <= u2_HIGH2NORM_SPD){
-													// 低速検出
-			u1s_roadJdgSts = ROADJDG_STS_CHKNORM;	// 一般道判定中へ
-		}
-		else if((F_SCP_H_PASS) || (F_SCP_HCHK_PASS) || (F_SCP_HCHK_NEAR_PASS)){
-			u1t_outReq = ON;
-			u1s_curLmtSpd = sts_scpPoint.un_extra.scp.b_lmtSpd;
-													// 現在の制限速度値更新
-		}
-		else if(u2s_scpPassTmr >= u2_SCP_NOPASS_TIM2){
-													// 非通過時間が一定時間経過
-			u1s_roadJdgSts = ROADJDG_STS_CHKNORM;	// 一般道判定中へ
-		}
-		break;
-//------------------------------------------------------------------------------------------------
-	case ROADJDG_STS_CHKNORM:							// 一般道判定中
-		if((F_SCP_N_PASS)								// 一般確定 or
-		|| (u1s_carStopTmr >= u1_STOP_CONT_TIM)			// 低速継続 or
-		|| (u2s_scpPassTmr >= u2_SCP_NOPASS_TIM2)		// いずれのSCPも通過せずに15分経過
-		|| (sts_gpsinf.u2_spd <= u2_NORMVALID_SPD)){	// 極低速検出
-			u1s_roadJdgSts = ROADJDG_STS_NORM;			// 一般道へ
-			if(F_SCP_N_PASS){
-				u1s_memLmtSpd = LMTSPD_NONE;
-			}
-			u1s_curLmtSpd = LMTSPD_NONE;
-		}
-		else if(F_SCP_H_PASS){							// 高速確定
-			u1s_roadJdgSts = ROADJDG_STS_HIGH;			// 高速道へ
-			u1s_curLmtSpd = sts_scpPoint.un_extra.scp.b_lmtSpd;
-														// 現在の制限速度値更新
-			u1t_outReq = ON;							// 出力要求
-		}
-		else if((F_SCP_HCHK_PASS) || (F_SCP_HCHK_NEAR_PASS)){
-														// 未確定SCP INポイント通過
-			u1s_curLmtSpd = sts_scpPoint.un_extra.scp.b_lmtSpd;
-														// 現在の制限速度値更新
-			u1s_roadJdgSts = ROADJDG_STS_CHKHIGH;		// 高速判別中へ
-		}
-		break;
-	}
-
-	return u1t_outReq;
-
-}
-
-EM_ROADJDG_STS	emg_GetCurrentRoad(void){
-
-	return	(EM_ROADJDG_STS)u1s_roadJdgSts;
 }
 
 //--------------------------------------------------------------------------
@@ -3735,17 +3154,6 @@ static U1	u1_GpsOrbisVcReq(ST_GPSMAP *psth_map, EM_VCGPS_TYPE emh_typ, ST_VCGPS 
 			psth_vcGps->extra.orbis.b_spdOver = ON;		// 速度超過
 		}
 		break;
-#if 0
-	case VCGPS_ORBIS_PASS:
-		if((psth_map->u2_dst > u2_DIST_50M)
-		&& ((psth_map->s2_degB < s2_DEG_TGTRNG_WIDE_MIN) || (psth_map->s2_degB > s2_DEG_TGTRNG_WIDE_MAX))){
-														// ポイントが50m以上後方になってしまったら
-			return NG;
-		}
-		psth_vcGps->common.u1_trgt = VCTGT_RD_ORBIS;	// オービスならばよい（言わない）
-		psth_vcGps->extra.orbis.b_pass = ON;			// 通過
-		break;
-#endif
 	}
 	return	OK;
 }
@@ -4091,17 +3499,6 @@ static U1	u1_Gps100mContVcReq(ST_GPSMAP *psth_map, ST_VCGPS *psth_vcGps){
 	case TGT_HWRADIO:
 		psth_vcGps->common.u1_trgt = VCTGT_HWRADIO;		// ハイウェイラジオ
 		break;
-	case TGT_KENKYO:
-		if(u1s_kenkyo_mem != psth_map->un_extra.kenkyo.u1_kenkyoNum){
-			psth_vcGps->common.u1_trgt = VCTGT_KENKYO;	// 県境
-			psth_vcGps->extra.kenkyo.b_kenkyo = ON;
-			psth_vcGps->extra.kenkyo.kenkyoNum = psth_map->un_extra.kenkyo.u1_kenkyoNum;
-			u1s_kenkyo_mem = psth_map->un_extra.kenkyo.u1_kenkyoNum;
-		}
-		else{
-			return NG;
-		}
-		break;
 	}
 
 	// (2)共通：トンネル
@@ -4297,36 +3694,6 @@ static void	SubVcReqUnder500m(U2 u2h_dst, ST_VCGPS *psth_vcGps){
 //【備考】GPSタスク以外から操作されるのでディスパッチ禁止で処理する			
 //--------------------------------------------------------------------------
 void	GpsVcEnQueue(EM_VC u1h_voice, EM_VCGPS_TYPE emh_vcType, U4 u4h_addr){
-
-	ST_GPSVC_QUEUE_CTRL	*pstt_queue_ctrl;
-
-	if(emh_vcType >= VC_LOPRI_QUEUE_STA){
-		pstt_queue_ctrl = &sts_gpsVcQueueCtrl[VCGPS_LOPRI];
-	}
-	else if(emh_vcType >= VC_MIDPRI_QUEUE_STA){
-		pstt_queue_ctrl = &sts_gpsVcQueueCtrl[VCGPS_MIDPRI];
-	}
-	else{
-		pstt_queue_ctrl = &sts_gpsVcQueueCtrl[VCGPS_HIPRI];
-	}
-
-	// 通常のキュー挿入要求時の処理
-	if(pstt_queue_ctrl->sts != VC_QUEUE_FULL){					// キューがフルでないとき
-		pstt_queue_ctrl->queue[pstt_queue_ctrl->wrPos].live_count = u4s_live_counter;
-		pstt_queue_ctrl->queue[pstt_queue_ctrl->wrPos].u1_vcNum = u1h_voice;		// ボイス番号記憶
-		pstt_queue_ctrl->queue[pstt_queue_ctrl->wrPos].em_vcType = emh_vcType;		// ボイスタイプ
-		pstt_queue_ctrl->queue[pstt_queue_ctrl->wrPos].u4_addr = u4h_addr;			// アドレス
-		pstt_queue_ctrl->wrPos++;
-		if(pstt_queue_ctrl->wrPos >= pstt_queue_ctrl->queueSize){
-			pstt_queue_ctrl->wrPos = 0;
-		}
-		if(pstt_queue_ctrl->wrPos == pstt_queue_ctrl->rdPos){
-			pstt_queue_ctrl->sts = VC_QUEUE_FULL;
-		}
-		else{
-			pstt_queue_ctrl->sts = VC_QUEUE_DATON;
-		}
-	}
 }
 
 //--------------------------------------------------------------------------//
@@ -4674,42 +4041,6 @@ static	U1	u1_JudgePOISet(ST_GPSMAP *psth_map){
 		}
 		break;
 
-	case TGT_SHAJYOU_AREA:
-		if(stg_setGps[u1g_setAcsSel].b_shajyoArea){	// 車上狙い多発エリアON
-			u1t_ret = OK;
-		}
-		break;
-
-	case TGT_PARKING:
-		if(stg_setGps[u1g_setAcsSel].b_parking){	// 駐車場表示ON
-			u1t_ret = OK;
-		}
-		break;
-
-	case TGT_MYAREA:								// 道路属性に依存しない
-	case TGT_MYCANCEL:
-	case TGT_PIN:
-		u1t_roadChk = ROADCHK_OFF;
-		u1t_ret = OK;
-		break;
-
-	case TGT_ETC:
-		if(stg_setGps[u1g_setAcsSel].b_etcLane){
-			if(u1t_roadSel != SET_ROAD_NORM){
-				u1t_ret = OK;
-				if(u1t_roadSel == SET_ROAD_AUTO){
-					if(psth_map->un_extra.etc.b_pointType == ETC_POINT_STOP){
-													// STOP点は
-						u1t_roadChk = ROADCHK_OFF;	// 道路属性不問
-					}
-				}
-				else{								// オール or 高速
-					u1t_roadChk = ROADCHK_OFF;		// 道路属性不問
-				}
-			}
-		}
-		break;
-
 	case TGT_CURVE:
 		if(stg_setGps[u1g_setAcsSel].b_curve){		// 急カーブON
 			u1t_ret = OK;
@@ -4718,12 +4049,6 @@ static	U1	u1_JudgePOISet(ST_GPSMAP *psth_map){
 
 	case TGT_BRAJCT:
 		if(stg_setGps[u1g_setAcsSel].b_brajct){		// 分岐・合流ON
-			u1t_ret = OK;
-		}
-		break;
-
-	case TGT_KENKYO:
-		if(stg_setGps[u1g_setAcsSel].b_kenkyo){		// 県境ON
 			u1t_ret = OK;
 		}
 		break;
@@ -4738,15 +4063,6 @@ static	U1	u1_JudgePOISet(ST_GPSMAP *psth_map){
 		if(stg_setGps[u1g_setAcsSel].b_torupa){		// とるぱON
 			u1t_ret = OK;
 		}
-		break;
-
-	case TGT_SCP_ICI:
-	case TGT_SCP_ICO:
-	case TGT_SCP_JC:
-	case TGT_SCP_SPD:
-	case TGT_SCP_PO:
-		u1t_roadChk = ROADCHK_ONLY_MAN;				// 手動時のみチェック要
-		u1t_ret = OK;
 		break;
 
 	case TGT_NOFIX_RD_ORBIS:
@@ -4765,20 +4081,6 @@ static	U1	u1_JudgePOISet(ST_GPSMAP *psth_map){
 		}
 		break;
 
-	case TGT_NOFIX_YUDO:
-	case TGT_NOFIX_SENSOR_YUDO:
-		u1t_ret = OK;
-		u1t_roadChk = ROADCHK_OFF;					// 道路判定不要
-		break;
-
-	case TGT_RAILROAD_CROSSING:						// 踏切
-	case TGT_TMPSTOP:								// 一時停止注意ポイント
-	case TGT_TOILET:
-	case TGT_KOBAN:
-	case TGT_FIRE:
-	case TGT_HOIKU:
-		u1t_ret = OK;								// マップ読み込み時に設定は確認済み
-		break;
 	case TGT_ZONE30:
 		if(stg_setGps[u1g_setAcsSel].b_zone30){		// ゾーン30
 			u1t_ret = OK;
@@ -4941,21 +4243,6 @@ static void	TransitDummy(EM_TGTDEG emh_tgtDeg){
 
 }
 
-/**
- * 現在，マイエリア内か？
- */
-Bool GpsCtrl_InMyArea(void)
-{
-    return g_InMyArea;
-}
-
-/**
- * 現在，マイキャンセルエリア内か？
- */
-Bool GpsCtrl_InMyCancelArea(void)
-{
-    return g_InMyCancelArea;
-}
 //--------------------------------------------------------------------------
 //【関数】可視インデックスリスト追加処理									
 //【機能】																	
@@ -5111,36 +4398,6 @@ static void sortSrcRefIdxByDistance(void)
     }
 }
 
-static void GuardPictNumber(ST_GPSMAP *psth_map){
-
-	switch(psth_map->un_type.bit.b_code){
-	case TGT_RD_ORBIS:
-	case TGT_HSYS_ORBIS:
-	case TGT_LHSYS_ORBIS:
-	case TGT_LOOP_ORBIS:
-	case TGT_TRAP_ZONE:
-	case TGT_CHKPNT_ZONE:
-	case TGT_MYAREA:
-	case TGT_MYCANCEL:
-	case TGT_ICANCEL:
-	case TGT_NOFIX_YUDO:
-	case TGT_NOFIX_RD_ORBIS:
-	case TGT_NOFIX_HSYS_ORBIS:
-	case TGT_NOFIX_LHSYS_ORBIS:
-	case TGT_NOFIX_LOOP_ORBIS:
-	case TGT_NOFIX_TRAP_ZONE:
-	case TGT_NOFIX_CHKPNT_ZONE:
-	case TGT_NOFIX_SENSOR_YUDO:
-		// ガードしないでそのまま
-		break;
-
-	default:
-		psth_map->un_extra.common.u2_mapPctNum = 0;
-		break;
-	}
-
-}
-
 // 音声ターゲット番号の変更
 static Bool	UpdateSoundTarget(U2 *pu2h_sndTgtNum, U4 *pu4h_orgAddress, const ST_GPSMAP *psth_map, U2 u2h_mapNum){ 
 
@@ -5290,104 +4547,8 @@ static void update_distance(ST_GPSMAP *psth_map)
 	}
 }
 
-static void TransitAreaStatusForRd(ST_GPSMAP *psth_map)
-{
-}
 
-static void TransitAreaStatusForSc(ST_GPSMAP *psth_map, U1 degChk)
-{
-}
 
-// カスタムデータの有効時間チェック
-typedef struct{
-	U2 year;
-	U1 month;
-	U1 day;
-	U1 hour;
-	U1 min;
-}ST_CUSTOM_DATE;
 
-static U4 month2day(U1 month, U2 year)
-{
-						   //  1  2  3  4  5  6  7  8  9  10 11 12
-	static const U4 cDay[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
-	
-	if(month == 2){
-		return 28 + (1 / ((U4)year % 4 + 1)) * (1 - 1 / ((U4)year % 100 + 1)) + (1 / ((U4)year % 400 + 1));
-	}
-	else{
-		return cDay[month-1];
-	}
-}
-
-static U4 getMinute(ST_CUSTOM_DATE date, U2 base_year)
-{
-	S4 n = (S4)date.year - (S4)base_year;
-	U4 min = 0;
-	U1 i;
-	
-	if(n < 0) return 0;
-	
-
-	for(; n>0; n--){
-		for(i=1; i<=12 ; i++){
-			min += month2day(i, base_year) * 24 * 60;
-		}
-	}
-	
-	for(i=1; i<date.month; i++){
-		min += month2day(i, date.year) * 24 * 60;
-	}
-	min += (U4)(date.day-1) * 24 * 60 + (U4)date.hour * 60 + (U4)date.min;
-	return min;
-}
-
-static Bool isCustomDateValid(ST_HEADER *header)
-{
-#define GUARD_MIN (24 * 60) // ガード時間 24時間(24*60分)
-	ST_CUSTOM_DATE ctm;
-	ST_CUSTOM_DATE gps;
-	
-	// gps
-	gps.year  = 2000 + (U2)stg_gpsSts.u1_year;
-	gps.month = stg_gpsSts.u1_month;
-	gps.day   = stg_gpsSts.u1_day;
-	gps.hour  = stg_gpsSts.u1_hour;
-	gps.min   = stg_gpsSts.u1_min;
-	// custom
-	ctm.year  = 2000 + (U2)header->u1_year;
-	ctm.month = header->u1_month;
-	ctm.day   = header->u1_day;
-	ctm.hour  = header->u1_hour;
-	ctm.min   = header->u1_min;
-
-	// gps<ctm エラー（GPSが古いことはありえない)
-	if((U4)gps.year * 100 + (U4)gps.month < (U4)ctm.year * 100 + (U4)ctm.month){
-		return FALSE;
-	}
-	if((gps.year == ctm.year)
-	&& (gps.month == ctm.month)
-	&& ((U4)gps.day * 100 * 100 + (U4)gps.hour * 100 + (U4)gps.min < 
-	    (U4)ctm.day * 100 * 100 + (U4)ctm.hour * 100 + (U4)ctm.min)){
-		return FALSE;
-	}
-	// 2年以上
-	if(gps.year - ctm.year >= 2){
-		return FALSE;
-	}
-
-	if(gps.year == ctm.year && gps.month == ctm.month){
-		// 月、年が同じ。日時分を分にして比較
-		U4 gps_min = gps.day * 24 * 60 + gps.hour * 60 + gps.min;
-		U4 ctm_min = ctm.day * 24 * 60 + ctm.hour * 60 + ctm.min;
-		return (gps_min - ctm_min >= GUARD_MIN) ? FALSE : TRUE;
-	}
-	else{
-		// 月、年を跨ぐ。ctm_year基準の分を比較
-		U4 gps_min = getMinute(gps, ctm.year);
-		U4 ctm_min = getMinute(ctm, ctm.year);
-		return (gps_min - ctm_min >= GUARD_MIN) ? FALSE : TRUE;
-	}
-}
 
 
