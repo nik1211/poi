@@ -647,15 +647,18 @@ void PoiSample(const char* fname, U2 dataSpec){
 	u2g_dataSpec = dataSpec;
 
 	SetMgrInit();
-
-	sts_gpsinf.lat = 2107021;
-	sts_gpsinf.lon = 8220672;
 	u2s_lonarea_old = U2_MAX;						// 前回経度エリア範囲外に
 
-	if(PhaseChkMov() == TRUE){
-		PhaseMakeMap();
-		PhaseChgMap();
-		PhaseChkWrn();
+	while(1){
+		// GPSの更新周期などで繰り返し処理される
+		sts_gpsinf.lat = 2107021;
+		sts_gpsinf.lon = 8220672;
+
+		if(PhaseChkMov() == TRUE){
+			PhaseMakeMap();
+			PhaseChgMap();
+			PhaseChkWrn();
+		}
 	}
 }
 
