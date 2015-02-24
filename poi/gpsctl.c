@@ -657,8 +657,8 @@ void PoiSample(const char* fname, U2 dataSpec){
 		if(PhaseChkMov() == TRUE){
 			PhaseMakeMap();
 			PhaseChgMap();
-			PhaseChkWrn();
 		}
+		PhaseChkWrn();
 	}
 }
 
