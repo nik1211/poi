@@ -653,6 +653,7 @@ void PoiSample(const char* fname, U2 dataSpec){
 		// GPS‚ÌXVüŠú‚È‚Ç‚ÅŒJ‚è•Ô‚µˆ—‚³‚ê‚é
 		sts_gpsinf.lat = 2107021;
 		sts_gpsinf.lon = 8220672;
+		k_lon2_meter = 1.855327755f * cosf((float)sts_gpsinf.lat * ZMATH_PI / (180.0f * 60000.0f));
 
 		if(PhaseChkMov() == TRUE){
 			PhaseMakeMap();
